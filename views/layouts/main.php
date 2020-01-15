@@ -27,7 +27,7 @@ AppAsset::register($this);
     $session = Yii::$app->session;
     $background = $session->get('background');
 ?>
-<body style="background-image: url('<?= isset($background)?$background:"" ?>');background-position: 0 0;background-size: 100% 100%;background-repeat: no-repeat;background-attachment: fixed;">
+<body style="background-color: #1b2838; background-image: url('<?= isset($background)?$background:"" ?>');background-position: 0 0;background-size: 100% 100%;background-repeat: no-repeat;background-attachment: fixed;">
 
 <?php 
     $session->remove("background");

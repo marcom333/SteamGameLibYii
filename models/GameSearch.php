@@ -11,6 +11,9 @@ use app\models\Game;
  */
 class GameSearch extends Game
 {
+
+    public $cname, $gname;
+
     /**
      * {@inheritdoc}
      */
@@ -18,7 +21,7 @@ class GameSearch extends Game
     {
         return [
             [['id', 'required_age', 'initial'], 'integer'],
-            [['name', 'img_icon_url', 'img_logo_url', 'controller_support', 'detailed_description', 'about_the_game', 'pc_requirements_minimum', 'pc_requirements_recomended', 'developers', 'publishers', 'price_currency', 'platforms', 'background'], 'safe'],
+            [['name', 'controller_support','gname', 'cname', 'platforms',], 'safe'],
         ];
     }
 
@@ -40,42 +43,78 @@ class GameSearch extends Game
      */
     public function search($params)
     {
-        $query = Game::find();
+        $query = (new \yii\db\Query())->
+            select(
+                [
+                    "game.id",
+                    "game.name name",
+                    "game.img_logo_url",
+                    "game.required_age",
+                    "game.controller_support",
+                    "game.platforms",
+                    "game.initial",
+                    "game.price_currency",
+                    'GROUP_CONCAT(DISTINCT category.name) cname',
+                    'GROUP_CONCAT(DISTINCT genre.name) gname',
+                ])->
+            from('game')->
+            join('LEFT JOIN', 'game_genre', 'game_genre.game_id = game.id')->
+            join('LEFT JOIN', 'genre', 'genre.id = game_genre.genre_id')->
+            join('LEFT JOIN', 'category_game', 'category_game.game_id = game.id')->
+            join('LEFT JOIN', 'category', 'category.id = category_game.category_id')->
+            groupBy("game.id");
 
-        // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => ['defaultOrder' => ['name' => SORT_ASC]],
         ]);
 
         $this->load($params);
 
         if (!$this->validate()) {
-            // uncomment the following line if you do not want to return any records when validation fails
-            // $query->where('0=1');
             return $dataProvider;
         }
+
+        $dataProvider->sort->attributes['name'] = [
+            'asc' => ['game.name' => SORT_ASC],
+            'desc' => ['game.name' => SORT_DESC],
+        ];
+
+        $dataProvider->sort->attributes['required_age'] = [
+            'asc' => ['game.required_age' => SORT_ASC],
+            'desc' => ['game.required_age' => SORT_DESC],
+        ];
+        
+        $dataProvider->sort->attributes['controller_support'] = [
+            'asc' => ['game.controller_support' => SORT_ASC],
+            'desc' => ['game.controller_support' => SORT_DESC],
+        ];
+
+        $dataProvider->sort->attributes['platforms'] = [
+            'asc' => ['game.platforms' => SORT_ASC],
+            'desc' => ['game.platforms' => SORT_DESC],
+        ];
+
+        $dataProvider->sort->attributes['initial'] = [
+            'asc' => ['game.initial' => SORT_ASC],
+            'desc' => ['game.initial' => SORT_DESC],
+        ];
 
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
             'required_age' => $this->required_age,
-            'initial' => $this->initial,
+            'initial' => $this->initial?($this->initial * 100):NULL,
         ]);
 
-        $query->andFilterWhere(['like', 'name', $this->name])
-            ->andFilterWhere(['like', 'img_icon_url', $this->img_icon_url])
-            ->andFilterWhere(['like', 'img_logo_url', $this->img_logo_url])
+        $query
+            ->andFilterWhere(['like', 'game.name', $this->name])
             ->andFilterWhere(['like', 'controller_support', $this->controller_support])
-            ->andFilterWhere(['like', 'detailed_description', $this->detailed_description])
-            ->andFilterWhere(['like', 'about_the_game', $this->about_the_game])
-            ->andFilterWhere(['like', 'pc_requirements_minimum', $this->pc_requirements_minimum])
-            ->andFilterWhere(['like', 'pc_requirements_recomended', $this->pc_requirements_recomended])
-            ->andFilterWhere(['like', 'developers', $this->developers])
-            ->andFilterWhere(['like', 'publishers', $this->publishers])
-            ->andFilterWhere(['like', 'price_currency', $this->price_currency])
             ->andFilterWhere(['like', 'platforms', $this->platforms])
-            ->andFilterWhere(['like', 'background', $this->background]);
+            ->andFilterWhere(['like', 'genre.name', $this->gname])
+            ->andFilterWhere(['like', 'category.name', $this->cname])
+        ;
 
         return $dataProvider;
     }

@@ -89,4 +89,7 @@ class Game extends \yii\db\ActiveRecord
     public function getCategory(){
         return $this->hasMany(Category::className(),['id' => 'category_id'])->viaTable('category_game', ['game_id' => 'id']);
     }
+    public function getTag(){
+        return $this->hasMany(Category::className(),['id' => 'category_id'])->viaTable('category_game', ['game_id' => 'id']);
+    }
 }

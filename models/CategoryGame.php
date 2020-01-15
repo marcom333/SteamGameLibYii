@@ -28,6 +28,7 @@ class CategoryGame extends \yii\db\ActiveRecord
         return [
             [['game_id', 'category_id'], 'required'],
             [['game_id', 'category_id'], 'integer'],
+            [['game_id', 'category_id'], 'unique', 'targetAttribute' => ['game_id', 'category_id']],
         ];
     }
 

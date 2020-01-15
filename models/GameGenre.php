@@ -28,6 +28,7 @@ class GameGenre extends \yii\db\ActiveRecord
         return [
             [['game_id', 'genre_id'], 'required'],
             [['game_id', 'genre_id'], 'integer'],
+            [['game_id', 'genre_id'], 'unique', 'targetAttribute' => ['game_id', 'genre_id']],
         ];
     }
 

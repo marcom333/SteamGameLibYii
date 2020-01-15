@@ -17,48 +17,42 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p><?= Html::a('Update Library', ['create'], ['class' => 'btn btn-success']) ?> <?= Html::a('Update Details', ['details'], ['class' => 'btn btn-success']) ?></p>
 
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-            [
-                "attribute"=>"icon",
-                'format' => 'html',
-                "value"=>function($model){
-                    return "<img src=\"https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/".$model->id."/" . $model->img_icon_url . ".jpg\">";
-                }
-            ],
             [
                 "attribute"=>"logo",
                 'format' => 'html',
                 "value"=>function($model){
-                    return "<img src=\"https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/".$model->id."/" . $model->img_logo_url . ".jpg\">";
+                    return "<img src=\"https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/".$model['id']."/" . $model['img_logo_url'] . ".jpg\">";
                 }
             ],
             'name',
             'required_age',
             'controller_support',
-            'developers',
-            'publishers',
-            'price_currency',
-            'initial',
             'platforms',
+            [
+                "attribute"=>'initial',
+                "value"=>function($model){
+                    return "$" . ($model['initial']/100)  . " " . $model['price_currency'];
+                }
+            ],
+            'gname',
+            'cname',
             [
                 'class' => 'yii\grid\ActionColumn',
                 'visible'=> true,
                 'template'=>"{view} {update} {run} {unistall}",
                 'buttons'=>[
                     'view'=>function ($url, $model) {
-                        return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', ['view','id'=>$model->id], ['class' => 'btn btn-default btn-xs custom_button']);
+                        return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', ['view','id'=>$model['id']], ['class' => 'btn btn-default btn-xs custom_button']);
                     },
                     'update'=>function ($url, $model) {
-                        return Html::a('<span class="glyphicon glyphicon-refresh"></span>', ['update','id'=>$model->id], ['class' => 'btn btn-default btn-xs custom_button']);
+                        return Html::a('<span class="glyphicon glyphicon-refresh"></span>', ['update','id'=>$model['id']], ['class' => 'btn btn-default btn-xs custom_button']);
                     },
                     'run'=>function ($url, $model){
-                        return Html::a('<span class="glyphicon glyphicon-play-circle"></span>', "steam://run/" . $model->id, ['class' => 'btn btn-default btn-xs custom_button']);
+                        return Html::a('<span class="glyphicon glyphicon-play-circle"></span>', "steam://run/" . $model['id'], ['class' => 'btn btn-default btn-xs custom_button']);
                     },
                 ],
             ]

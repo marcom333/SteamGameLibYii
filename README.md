@@ -42,11 +42,9 @@ return [
     'steam_api'=>'STEAM_API_EXAMPLE12345123',
 ];
 ```
-
-<aside class="notice">
-    <b>WARNING</b> You should create the database using utf8mb4_bin for collation because Steam accept 
+> **_WARNING:_**  You should create the database using utf8mb4_bin for collation because Steam accept 
     the use of EMOJI and that kind of characters will cause an error if use another collation.
-</aside>
+
 
 After creating and editing the file params.php, you need to edit db.php. This file need the conection type,
 URL, user and password. 

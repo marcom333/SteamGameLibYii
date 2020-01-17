@@ -1,13 +1,10 @@
 REQUIREMENTS
 ------------
 
-APACHE
-
-MYSQL
-
-PHP 5.1 or newer
-
-[Composer](http://getcomposer.org/)
+* APACHE
+* MYSQL
+* PHP 5.1 or newer
+* [Composer](http://getcomposer.org/)
 
 INSTALLATION
 ------------

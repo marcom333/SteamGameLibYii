@@ -8,7 +8,7 @@ use Yii;
  * This is the model class for table "genre".
  *
  * @property int $id
- * @property string $name
+ * @property string|null $name
  */
 class Genre extends \yii\db\ActiveRecord
 {
@@ -26,9 +26,10 @@ class Genre extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id', 'name'], 'required'],
+            [['id'], 'required'],
             [['id'], 'integer'],
             [['name'], 'string', 'max' => 100],
+            [['id'], 'unique'],
         ];
     }
 

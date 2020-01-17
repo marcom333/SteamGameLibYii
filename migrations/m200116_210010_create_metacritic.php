@@ -13,13 +13,11 @@ class m200116_210010_create_metacritic extends Migration
     public function safeUp()
     {
         $this->createTable("metacritic",[ 
-            "id"=>$this->integer()->notNull(),
+            "id"=>$this->primaryKey(),
             "game_id"=>$this->integer()->notNull(),
             "score"=>$this->integer(),
             "url"=>$this->string(512),
         ]);
-
-        $this->addPrimaryKey('metacritic_pk', 'metacritic', ['id']);
     }
 
     /**

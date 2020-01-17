@@ -121,3 +121,12 @@ a.desc:after {
     margin-top: 90px;
     margin-bottom: 30px;
 }
+
+
+.carousel-control.right {
+    padding-top: 30%;
+}
+  
+.carousel-control.left{
+    padding-top: 30%;
+}

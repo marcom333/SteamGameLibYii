@@ -36,12 +36,18 @@ $this->params['breadcrumbs'][] = $this->title;
                         return "$" . ($model['initial']/100)  . " " . $model['price_currency'];
                     }
                 ],
-                'gname',
-                'cname',
+                [
+                    "attribute"=>'gname',
+                    "label"=>"Genre",
+                ],
+                [
+                    "attribute"=>'cname',
+                    "label"=>"Category",
+                ],
                 [
                     'class' => 'yii\grid\ActionColumn',
                     'visible'=> true,
-                    'template'=>"{view} {update} {run} {unistall}",
+                    'template'=>"{view} {update} {run}",
                     'buttons'=>[
                         'view'=>function ($url, $model) {
                             return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', ['view','id'=>$model['id']], ['class' => 'btn btn-default btn-xs custom_button']);

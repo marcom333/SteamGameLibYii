@@ -17,24 +17,21 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Run', "steam://run/" . $model->id, ['class' => 'btn btn-success']) ?>
-        <?= Html::a('Steam', "https://store.steampowered.com/app/" . $model->id . "/", ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Play', "steam://run/" . $model->id, ['class' => 'btn btn-success']) ?>
+        <?= Html::a( Html::img("@web/img/steam-logo.png",["height"=>"20px"]) . " Store ", "https://store.steampowered.com/app/" . $model->id . "/",["class"=>"btn btn-default"]) ?>
+        <?= Html::a( Html::img("@web/img/steam-db-logo.png",["height"=>"20px"]) . "DB" , "https://steamdb.info/app/$model->id/" , ["class"=>"btn btn-default"]); ?>
     </p>
 
     <div class="col-md-offset-3 col-md-6">
-        <br>
         <?php 
             $screens = [];
             foreach($model->screenshots as $screen){
-                array_push($screens,"<img src='".$screen->path_thumbnail."'>");
+                array_push($screens,"<img src='".$screen->path_thumbnail."' style='width: 100%'>");
             }
-            //var_dump($screens);
-            //die();
             if(sizeof($screens) > 0){
                 echo Carousel::widget(['items' => $screens]);
             }
         ?>
-        </br>
     </div>
 
     <div style="background-color: rgb(200,200,200); padding: 5px; border-radius:10px">
@@ -49,9 +46,13 @@ $this->params['breadcrumbs'][] = $this->title;
             'pc_requirements_recomended:html',
             'developers',
             'publishers',
-            'price_currency',
-            'price',
             'platforms',
+            [
+                'attribute' => 'price',
+                'value' => function($model){
+                    return "$" .  $model->price . " " . $model->price_currency;
+                }
+            ],
             [
                 'attribute' => 'genre',
                 'value' => function($model){
@@ -75,5 +76,14 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]) ?>
     </div>
+<script>
+    (function() {
+        var link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+        link.type = 'image/x-icon';
+        link.rel = 'shortcut icon';
+        link.href = '<?= "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/".$model->id."/" . $model->img_logo_url . ".jpg" ?>';
+        document.getElementsByTagName('head')[0].appendChild(link);
+    })();
+</script>
 
 </div>

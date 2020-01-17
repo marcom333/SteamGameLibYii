@@ -26,6 +26,9 @@ phpunit.phar
 # local phpunit config
 /phpunit.xml
 
+# special configuration file
+/config/params.php
+
 tests/_output/*
 tests/_support/_generated
 

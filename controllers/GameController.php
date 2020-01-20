@@ -53,13 +53,12 @@ class GameController extends Controller
     public function actionView($id)
     {
         $model = $this->findModel($id);
-
         $session = Yii::$app->session;
         $session->set("background",$model->background);
-
-        return $this->render('view', [
-            'model' => $model,
-        ]);
+        if(Yii::$app->request->isAjax){
+            return $this->renderAjax('view', ['model' => $model,]);
+        }
+        return $this->render('view', ['model' => $model,]);
     }
 
     /**
@@ -131,6 +130,69 @@ class GameController extends Controller
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+
+    /**
+     * Lists all Game models.
+     * @return mixed
+     */
+    public function actionLibrary()
+    {
+        return $this->render('library', [
+            "genres"=>\app\models\Genre::find()->all(),
+            "categories"=>\app\models\Category::find()->all(),
+            "tags"=>[],
+        ]);
+    }
+
+    /**
+     * Lists all Game models.
+     * @return mixed
+     */
+    public function actionFolder()
+    {
+        return $this->renderPartial('_folder', []);
+    }
+
+    /**
+     * Lists all Game models.
+     * @return mixed
+     */
+    public function actionGenre($id){
+        $genre = \app\models\Genre::findOne(["id"=>$id]);
+        $games = (new \yii\db\Query())->select(
+            [
+                "game.id",
+                "game.name name",
+                "game.img_icon_url",
+                'GROUP_CONCAT(DISTINCT genre.name) gname',
+            ])->
+        from('game')->
+        join('LEFT JOIN', 'game_genre', 'game_genre.game_id = game.id')->
+        join('LEFT JOIN', 'genre', 'genre.id = game_genre.genre_id')->
+        groupBy("game.id");
+        $games->andFilterWhere(['like', 'genre.name', $genre->name]);
+
+        return $this->renderPartial("_genre",["genre"=>$genre,"games"=>$games->all()]);
+    }
+
+    /**
+     * Lists all Game models.
+     * @return mixed
+     */
+    public function actionCategory()
+    {
+        return $this->renderPartial('_cat', []);
+    }
+
+    /**
+     * Lists all Game models.
+     * @return mixed
+     */
+    public function actionTag()
+    {
+        return $this->renderPartial('_tag', []);
     }
 
 }

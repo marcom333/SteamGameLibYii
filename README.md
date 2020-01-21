@@ -93,6 +93,6 @@ For Developers
 * [ ] Remove categories to a game
 * [ ] Remove folders to a game
 * [ ] Make it online
-* * [ ] Make game libraries
-* * [ ] sign in through steam
-* * [ ] login in through steam
+* * * [ ] Make game libraries
+* * * [ ] sign in through steam
+* * * [ ] login in through steam

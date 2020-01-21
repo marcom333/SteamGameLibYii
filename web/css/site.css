@@ -140,3 +140,7 @@ a.desc:after {
     padding-bottom: 2px;
     margin-bottom: 4px;
 }
+
+.label.label-default > a{
+    color: red;
+}

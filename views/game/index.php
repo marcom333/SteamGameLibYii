@@ -15,7 +15,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <p><?= Html::a('Update Library', ['create'], ['class' => 'btn btn-success']) ?> <?= Html::a('Update Details', ['details'], ['class' => 'btn btn-success']) ?></p>
+    <p>
+        <?= Html::a('Update Library', ['create'], ['class' => 'btn btn-success']) ?> 
+        <?= ""//Html::a('Update Details', ['details'], ['class' => 'btn btn-success']) ?>
+    </p>
     <div style="background-color: rgb(200,200,200); padding: 5px; border-radius:10px" class="table-responsive">
         <?= GridView::widget([
             'dataProvider' => $dataProvider,

@@ -92,4 +92,7 @@ class Game extends \yii\db\ActiveRecord
     public function getTag(){
         return $this->hasMany(Tag::className(),['id' => 'tag_id'])->viaTable('game_tag', ['game_id' => 'id']);
     }
+    public function getFolder(){
+        return $this->hasMany(Folder::className(),['id' => 'folder_id'])->viaTable('folder_game', ['game_id' => 'id']);
+    }
 }

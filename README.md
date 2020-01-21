@@ -80,19 +80,19 @@ For Developers
 
 ### TO DO
 
-* [ ] Hide unwanted tags
-* [ ] Hide unwanted genres
-* [ ] Hide unwanted categories
-* [ ] Add folders to games
-* [ ] Add folders to folders :u
-* [ ] Add tags to a game
-* [ ] Add genres to a game
-* [ ] Add categories to a game
-* [ ] Remove tags to a game
-* [ ] Remove genres to a game
-* [ ] Remove categories to a game
-* [ ] Remove folders to a game
-* [ ] Make it online
-* * * [ ] Make game libraries
-* * * [ ] sign in through steam
-* * * [ ] login in through steam
+* * [ ] Hide unwanted tags
+* * [ ] Hide unwanted genres
+* * [ ] Hide unwanted categories
+* * [ ] Add folders to games
+* * [ ] Add folders to folders :u
+* * [ ] Add tags to a game
+* * [ ] Add genres to a game
+* * [ ] Add categories to a game
+* * [ ] Remove tags to a game
+* * [ ] Remove genres to a game
+* * [ ] Remove categories to a game
+* * [ ] Remove folders to a game
+* * [ ] Make it online
+    * * [ ] Make game libraries
+    * * [ ] sign in through steam
+    * * [ ] login in through steam

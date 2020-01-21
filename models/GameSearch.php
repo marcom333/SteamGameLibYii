@@ -12,7 +12,7 @@ use app\models\Game;
 class GameSearch extends Game
 {
 
-    public $cname, $gname;
+    public $cname, $gname, $tname;
 
     /**
      * {@inheritdoc}
@@ -21,7 +21,7 @@ class GameSearch extends Game
     {
         return [
             [['id', 'required_age', 'initial'], 'integer'],
-            [['name', 'controller_support','gname', 'cname', 'platforms',], 'safe'],
+            [['name', 'controller_support','gname', 'cname', 'tname', 'platforms',], 'safe'],
         ];
     }
 
@@ -56,12 +56,17 @@ class GameSearch extends Game
                     "game.price_currency",
                     'GROUP_CONCAT(DISTINCT category.name) cname',
                     'GROUP_CONCAT(DISTINCT genre.name) gname',
+                    'GROUP_CONCAT(DISTINCT tag.name) tname',
                 ])->
             from('game')->
             join('LEFT JOIN', 'game_genre', 'game_genre.game_id = game.id')->
             join('LEFT JOIN', 'genre', 'genre.id = game_genre.genre_id')->
             join('LEFT JOIN', 'category_game', 'category_game.game_id = game.id')->
             join('LEFT JOIN', 'category', 'category.id = category_game.category_id')->
+            
+            join('LEFT JOIN', 'game_tag', 'game_tag.game_id = game.id')->
+            join('LEFT JOIN', 'tag', 'tag.id = game_tag.tag_id')->
+
             groupBy("game.id");
 
 
@@ -117,6 +122,7 @@ class GameSearch extends Game
             ->andFilterWhere(['like', 'platforms', $this->platforms])
             ->andFilterWhere(['like', 'genre.name', $this->gname])
             ->andFilterWhere(['like', 'category.name', $this->cname])
+            ->andFilterWhere(['like', 'tag.name', $this->tname])
         ;
 
         return $dataProvider;

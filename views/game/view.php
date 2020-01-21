@@ -29,7 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 array_push($screens,"<img src='".$screen->path_thumbnail."' style='width: 100%'>");
             }
             if(sizeof($screens) > 0){
-                echo Carousel::widget(['items' => $screens]);
+                echo Carousel::widget(['items' => $screens,"id"=>"previews"]);
             }
         ?>
     </div>
@@ -68,6 +68,16 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => function($model){
                     $data = "";
                     foreach($model->category as $cat){
+                        $data .= "[" . $cat->name . "] ";
+                    }
+                    return $data;
+                }
+            ],
+            [
+                'attribute' => 'tag',
+                'value' => function($model){
+                    $data = "";
+                    foreach($model->tag as $cat){
                         $data .= "[" . $cat->name . "] ";
                     }
                     return $data;

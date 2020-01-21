@@ -39,10 +39,23 @@ $this->params['breadcrumbs'][] = $this->title;
                 [
                     "attribute"=>'gname',
                     "label"=>"Genre",
+                    "value"=>function($model){
+                        return str_replace(",",", ", $model["gname"]);
+                    }
                 ],
                 [
                     "attribute"=>'cname',
                     "label"=>"Category",
+                    "value"=>function($model){
+                        return str_replace(",",", ", $model["cname"]);
+                    }
+                ],
+                [
+                    "attribute"=>'tname',
+                    "label"=>"Tag",
+                    "value"=>function($model){
+                        return str_replace(",",", ", $model["tname"]);
+                    }
                 ],
                 [
                     'class' => 'yii\grid\ActionColumn',

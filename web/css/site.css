@@ -130,3 +130,13 @@ a.desc:after {
 .carousel-control.left{
     padding-top: 30%;
 }
+
+.clickable{
+    cursor: pointer;
+    background-color: rgba(0,0,0,0.2);
+    color: white;
+    padding-left: 4px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    margin-bottom: 4px;
+}

@@ -3,17 +3,18 @@
 use yii\db\Migration;
 
 /**
- * Class m200116_210028_create_tag
+ * Class m200121_174813_crate_folder
  */
-class m200116_210028_create_tag extends Migration
+class m200121_174813_crate_folder extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        $this->createTable("tag",[ 
+        $this->createTable("folder",[ 
             "id"=>$this->primaryKey(),
+            "folder_id"=>$this->integer(),
             "name"=>$this->string(100),
         ]);
     }
@@ -23,7 +24,7 @@ class m200116_210028_create_tag extends Migration
      */
     public function safeDown()
     {
-        echo "m200116_210028_create_tag cannot be reverted.\n";
+        echo "m200121_174813_crate_folder cannot be reverted.\n";
 
         return false;
     }
@@ -37,7 +38,7 @@ class m200116_210028_create_tag extends Migration
 
     public function down()
     {
-        echo "m200116_210028_create_tag cannot be reverted.\n";
+        echo "m200121_174813_crate_folder cannot be reverted.\n";
 
         return false;
     }

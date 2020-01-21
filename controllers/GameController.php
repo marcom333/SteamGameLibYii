@@ -142,7 +142,8 @@ class GameController extends Controller
         return $this->render('library', [
             "genres"=>\app\models\Genre::find()->all(),
             "categories"=>\app\models\Category::find()->all(),
-            "tags"=>[],
+            "tags"=>\app\models\Tag::find()->all(),
+            "folders"=>\app\models\Folder::find()->where(['is', 'folder_id' , null])->all(),
         ]);
     }
 
@@ -150,17 +151,38 @@ class GameController extends Controller
      * Lists all Game models.
      * @return mixed
      */
-    public function actionFolder()
-    {
-        return $this->renderPartial('_folder', []);
+    public function actionFolder($id){   
+        $subFolder = \app\models\Folder::find()->where(["folder_id"=>$id])->all();
+        $games = (new \yii\db\Query())->select([
+                "game.id",
+                "game.name name",
+                "game.img_icon_url",
+                'GROUP_CONCAT(DISTINCT folder.name) gname',])->
+            from('game')->
+            join('LEFT JOIN', 'folder_game', 'folder_game.game_id = game.id')->
+            join('LEFT JOIN', 'folder', 'folder.id = folder_game.folder_id')->
+            groupBy("game.id")->
+            andFilterWhere(['like', 'folder.id', $id])->all();
+        
+        $level = $this->getFolderLevel($id,1);
+        
+        return $this->renderPartial('_folder', ["subFolder"=>$subFolder, "games"=>$games, "level"=>$level]);
     }
+
+    public function getFolderLevel($id,$level){
+        $folder = \app\models\Folder::findOne([["id"=>$id]]);
+        if($folder->folder_id){
+            $level = $this->getFolderLevel($folder->folder_id,$level+1);
+        }
+        return $level;
+    }
+
 
     /**
      * Lists all Game models.
      * @return mixed
      */
     public function actionGenre($id){
-        $genre = \app\models\Genre::findOne(["id"=>$id]);
         $games = (new \yii\db\Query())->select(
             [
                 "game.id",
@@ -172,27 +194,49 @@ class GameController extends Controller
         join('LEFT JOIN', 'game_genre', 'game_genre.game_id = game.id')->
         join('LEFT JOIN', 'genre', 'genre.id = game_genre.genre_id')->
         groupBy("game.id");
-        $games->andFilterWhere(['like', 'genre.name', $genre->name]);
+        $games->andFilterWhere(['=', 'genre.id', $id]);
 
-        return $this->renderPartial("_genre",["genre"=>$genre,"games"=>$games->all()]);
+        return $this->renderPartial("_games",["games"=>$games->all()]);
     }
 
     /**
      * Lists all Game models.
      * @return mixed
      */
-    public function actionCategory()
-    {
-        return $this->renderPartial('_cat', []);
+    public function actionCategory($id){
+        $games = (new \yii\db\Query())->select(
+            [
+                "game.id",
+                "game.name name",
+                "game.img_icon_url",
+                'GROUP_CONCAT(DISTINCT category.name) cname',
+            ])->
+        from('game')->
+        join('LEFT JOIN', 'category_game', 'category_game.game_id = game.id')->
+        join('LEFT JOIN', 'category', 'category.id = category_game.category_id')->
+        groupBy("game.id")->andFilterWhere(['=', 'category.id', $id]);
+
+        return $this->renderPartial("_games",["games"=>$games->all()]);
     }
 
     /**
      * Lists all Game models.
      * @return mixed
      */
-    public function actionTag()
-    {
-        return $this->renderPartial('_tag', []);
+    public function actionTag($id){
+        $games = (new \yii\db\Query())->select(
+            [
+                "game.id",
+                "game.name name",
+                "game.img_icon_url",
+                'GROUP_CONCAT(DISTINCT tag.name) tname',
+            ])->
+        from('game')->
+        join('LEFT JOIN', 'game_tag', 'game_tag.game_id = game.id')->
+        join('LEFT JOIN', 'tag', 'tag.id = game_tag.tag_id')->
+        groupBy("game.id")->andFilterWhere(['=', 'tag.id', $id]);
+
+        return $this->renderPartial("_games",["games"=>$games->all()]);
     }
 
 }

@@ -155,7 +155,22 @@ class SteamAPI{
                 }
             }
         }
-        
+
+        $tags = $this->getTags($model->id);
+        if($tags){
+            foreach($tags as $tag){
+                $tagm = \app\models\Tag::findOne(["name"=>$tag]);
+                if(!$tagm){
+                    $tagm = new \app\models\Tag();
+                    $tagm->name = $tag;
+                    $tagm->save();
+                }
+                $tagmix = new \app\models\GameTag();
+                $tagmix->tag_id = $tagm->id;
+                $tagmix->game_id = $model->id;
+                $tagmix->save();
+            }
+        }
 
         if($model->save()){
             $total++;
@@ -167,6 +182,31 @@ class SteamAPI{
         return ["total"=>$total,"fail"=>$fail];
     }
 
+    public function getTags($id){
+        $url = "https://store.steampowered.com/app/$id/";
+        $ch = curl_init();
+        curl_setopt_array ( $ch, 
+            [
+                CURLOPT_HTTPHEADER => ['Accept: application/json'],
+                CURLOPT_URL => $url,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_SSL_VERIFYPEER => false,
+            ]
+        );
+        $result = curl_exec ( $ch );
+
+        $tags = [];
+
+        foreach( explode("<a href=\"https://store.steampowered.com/tags/en/",$result) as $row){
+            if(strpos($row,"class=\"app_tag\"")){
+                $end = strpos($row, "/?snr=1_5_9__409\" class=\"app_tag\" style=\"display: none;\">");
+                $data = substr($row, 0, ($end));
+                $data = urldecode($data);
+                $tags[$data] = $data;
+            }
+        }
+        return $tags;
+    }
 
     public function noStore($model){
         $model->required_age = 0;

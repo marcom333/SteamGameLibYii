@@ -10,6 +10,7 @@ use Yii;
  * @property int $id
  * @property int|null $folder_id
  * @property string|null $name
+ * @property int|null $user_id
  */
 class Folder extends \yii\db\ActiveRecord
 {
@@ -27,7 +28,7 @@ class Folder extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['folder_id'], 'integer'],
+            [['folder_id', 'user_id'], 'integer'],
             [['name'], 'string', 'max' => 100],
         ];
     }
@@ -41,6 +42,7 @@ class Folder extends \yii\db\ActiveRecord
             'id' => 'ID',
             'folder_id' => 'Folder ID',
             'name' => 'Name',
+            'user_id' => 'User ID',
         ];
     }
 }

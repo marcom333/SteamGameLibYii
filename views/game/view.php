@@ -101,7 +101,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'attribute' => 'folder',
-                "format"=>"html",
+                "format"=>"raw",
                 'value' => function($model){
                     $data = "";
                     foreach($model->folder as $folder){
@@ -109,10 +109,19 @@ $this->params['breadcrumbs'][] = $this->title;
                         $data .= 
                             "<div class='label label-default' id='$id'>". 
                                 $folder->name . 
-                                Html::a('<span class="glyphicon glyphicon-remove"></span>',["gametag/delete","tag_id"=>$folder->id,"game_id"=>$model->id]) . 
+                                
+                                Html::a(
+                                    '<span class="glyphicon glyphicon-remove"></span>', 
+                                    ["deletefolder","folder"=>$folder->id,"id"=>$model->id], [
+                                    'id'=>"folder".$folder->id,
+                                    'data' => [
+                                        'confirm' => 'Remove folder?',
+                                        'method' => 'post',
+                                    ],
+                                ]).
                             '</div> ';
                     }
-                    return $data . Html::a("+ Add Folder",["foldergame/create","game_id"],["class"=>"label label-primary"]);
+                    return $data . Html::a("+ Add Folder",["game/addfolder","id"=>$model->id],["class"=>"label label-primary"]);
                 }
             ]
         ],

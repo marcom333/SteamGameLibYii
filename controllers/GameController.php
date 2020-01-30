@@ -35,6 +35,7 @@ class GameController extends Controller{
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                    'deletefolder'=>['POST'],
                 ],
             ],
         ];
@@ -186,7 +187,6 @@ class GameController extends Controller{
         return $level;
     }
 
-
     /**
      * Lists all Game models.
      * @return mixed
@@ -246,5 +246,45 @@ class GameController extends Controller{
         groupBy("game.id")->andFilterWhere(['=', 'tag.id', $id]);
 
         return $this->renderPartial("_games",["games"=>$games->all()]);
+    }
+
+    public function actionAddfolder($id,$path=null){
+        $folder = \app\models\Folder::find()->where(["user_id"=>Yii::$app->user->id]);
+        if($path){
+            $folder->andWhere(["folder_id"=>$path]);
+        }
+        else{
+            $folder->andWhere(["is","folder_id",null]);
+        }
+        if(isset($_POST['addfolder']) && isset($_POST['name']) && $_POST['name']){
+            $fold = new \app\models\Folder();
+            $fold->folder_id = $path;
+            $fold->name = $_POST['name'];
+            $fold->user_id = Yii::$app->user->id;
+            if($fold->save()){}
+
+        }
+        if(isset($_POST['savefolder']) && isset($_POST['name']) && $_POST['name']){
+            $fold = new \app\models\Folder();
+            $fold->folder_id = $path;
+            $fold->name = $_POST['name'];
+            $fold->user_id = Yii::$app->user->id;
+            if($fold->save()){
+                $gamefold = new \app\models\FolderGame();
+                $gamefold->folder_id = $fold->id;
+                $gamefold->game_id = $id;
+                if($gamefold->save()){
+                    return $this->redirect(['view','id'=>$id]);
+                }
+            }
+
+        }
+        return $this->render("folder",["folders"=>$folder->all(),"id"=>$id]);
+    }
+
+    public function actionDeletefolder($id, $folder){ 
+        $model = \app\models\Folder::findOne($folder);
+        if($model){ $model->delete(); }
+        return $this->redirect(['view','id'=>$id]);
     }
 }

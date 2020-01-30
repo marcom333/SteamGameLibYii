@@ -42,4 +42,9 @@ class GameGenre extends \yii\db\ActiveRecord
             'genre_id' => 'Genre ID',
         ];
     }
+
+    public function getGenre(){
+        return $this->hasOne(Genre::class,["id"=>"genre_id"]);
+    }
+
 }

@@ -5,21 +5,32 @@ namespace app\controllers;
 use Yii;
 use app\models\Game;
 use app\models\GameSearch;
+use app\models\ZGameSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
+use yii\filters\AccessControl;
 /**
  * GameController implements the CRUD actions for Game model.
  */
-class GameController extends Controller
-{
+class GameController extends Controller{
     /**
      * {@inheritdoc}
      */
-    public function behaviors()
-    {
+    public function behaviors(){
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'only' => ['view','search','library'],
+                'rules' => [
+                    [
+                        'actions' => ['view','library','search'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -33,9 +44,14 @@ class GameController extends Controller
      * Lists all Game models.
      * @return mixed
      */
-    public function actionIndex()
-    {
+    public function actionSearch($admin = false){
         $searchModel = new GameSearch();
+        
+        if(Yii::$app->user->identity->rol == 1  && $self){
+            $searchModel->setAdmin();
+        }
+        $searchModel->setUser_id(Yii::$app->user->id);
+
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -50,8 +66,7 @@ class GameController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
-    {
+    public function actionView($id){
         $model = $this->findModel($id);
         $session = Yii::$app->session;
         $session->set("background",$model->background);
@@ -66,15 +81,13 @@ class GameController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
-    {
-        $data = (new clases\SteamAPI)->getOwnedGames(76561198074483365);
+    public function actionCreate(){
+        $data = (new clases\SteamAPI)->getOwnedGames(Yii::$app->user->id);
 
-        return $this->redirect(['index']);
+        return $this->redirect(['search']);
     }
 
-    public function actionDetails()
-    {
+    public function actionDetails(){
         $session = Yii::$app->session;
         foreach(Game::find()->all() as $game ){
             if($game->required_age === null){
@@ -83,7 +96,7 @@ class GameController extends Controller
             }
         }
 
-        return $this->redirect(['index']);
+        return $this->redirect(['search']);
     }
 
     /**
@@ -93,8 +106,7 @@ class GameController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id)
-    {
+    public function actionUpdate($id){
         $model = $this->findModel($id);
 
         (new clases\SteamAPI)->updateGameInfo($model);
@@ -109,11 +121,10 @@ class GameController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
-    {
+    public function actionDelete($id){
         $this->findModel($id)->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(['search']);
     }
 
     /**
@@ -123,8 +134,7 @@ class GameController extends Controller
      * @return Game the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
-    {
+    protected function findModel($id){
         if (($model = Game::findOne($id)) !== null) {
             return $model;
         }
@@ -137,8 +147,7 @@ class GameController extends Controller
      * Lists all Game models.
      * @return mixed
      */
-    public function actionLibrary()
-    {
+    public function actionLibrary(){
         return $this->render('library', [
             "genres"=>\app\models\Genre::find()->all(),
             "categories"=>\app\models\Category::find()->all(),
@@ -238,5 +247,4 @@ class GameController extends Controller
 
         return $this->renderPartial("_games",["games"=>$games->all()]);
     }
-
 }

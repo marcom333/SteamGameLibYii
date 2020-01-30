@@ -47,7 +47,7 @@ AppAsset::register($this);
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
             ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'Game DB', 'url' => ['/game/index']],
+            ['label' => 'Search', 'url' => ['/game/search']],
             ['label' => 'Library', 'url' => ['/game/library']],
             Yii::$app->user->isGuest ? (
                 ['label' => 'Login', 'url' => ['/site/login']]
@@ -77,9 +77,9 @@ AppAsset::register($this);
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left">&copy; My Company <?= date('Y') ?></p>
+        <p class="pull-left">&copy; Who read this? <?= date('Y') ?></p>
 
-        <p class="pull-right"><?= Yii::powered() ?></p>
+        <p class="pull-right">I made this with Yii 2 Framework.</p>
     </div>
 </footer>
 

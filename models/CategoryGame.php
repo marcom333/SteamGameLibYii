@@ -42,4 +42,8 @@ class CategoryGame extends \yii\db\ActiveRecord
             'category_id' => 'Category ID',
         ];
     }
+
+    public function getCategory(){
+        return $this->hasOne(Category::class,["id"=>'category_id']);
+    }
 }

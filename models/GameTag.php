@@ -42,4 +42,8 @@ class GameTag extends \yii\db\ActiveRecord
             'tag_id' => 'Tag ID',
         ];
     }
+
+    public function getTag(){
+        return $this->hasOne(Tag::class,["id"=>'tag_id']);
+    }
 }

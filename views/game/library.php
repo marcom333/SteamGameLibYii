@@ -9,7 +9,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div class="game-index">
     <h1><?= Html::encode($this->title) ?></h1>
-
+    <p><?= Html::a('Update Library', ['create'], ['class' => 'btn btn-primary']) ?> <?= Html::a('Find Game', ['search'], ['class' => 'btn btn-primary']) ?></p>
     <div style="height: 800px !Important; overflow-y: auto;" class="col-md-3">
         <h3>Menu</h3>
         <div id="folder">
@@ -108,10 +108,7 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
         </div>
 
-        </div>
     </div>
     
-    <div class="col-md-9" id="data">
-            
-    </div>
+    <div class="col-md-9" id="data"></div>
 </div>

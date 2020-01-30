@@ -13,6 +13,11 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="site-login">
     <h1><?= Html::encode($this->title) ?></h1>
 
+    <div class="alert alert-info">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        Don't own an account? <strong> <?= Html::a("Make one",["user/create"]) ?></strong>
+    </div>
+    
     <p>Please fill out the following fields to login:</p>
 
     <?php $form = ActiveForm::begin([
@@ -39,9 +44,4 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
 
     <?php ActiveForm::end(); ?>
-
-    <div class="col-lg-offset-1" style="color:#999;">
-        You may login with <strong>admin/admin</strong> or <strong>demo/demo</strong>.<br>
-        To modify the username/password, please check out the code <code>app\models\User::$users</code>.
-    </div>
 </div>

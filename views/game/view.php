@@ -7,7 +7,7 @@ use yii\bootstrap\Carousel;
 /* @var $model app\models\Game */
 
 $this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Games', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Search', 'url' => ['search']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
@@ -38,6 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
+            'update',
             'required_age',
             'controller_support',
             'detailed_description:html',
@@ -63,10 +64,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         $data .= 
                             "<div class='label label-default' id='$id'>". 
                                 $genre->name . 
-                                Html::a('<span class="glyphicon glyphicon-remove"></span>',["gamegenre/delete","genre_id"=>$genre->id,"game_id"=>$model->id]) . 
                             '</div> ';
                     }
-                    return $data . Html::a("+ Add Genre",["foldergame/create","game_id"],["class"=>"label label-primary"]);
+                    return $data;
                 }
             ],
             [
@@ -79,10 +79,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         $data .= 
                             "<div class='label label-default' id='$id'>". 
                                 $cat->name . 
-                                Html::a('<span class="glyphicon glyphicon-remove"></span>',["categorygame/delete","category_id"=>$cat->id,"game_id"=>$model->id]) . 
                             '</div> ';
                     }
-                    return $data . Html::a("+ Add Category",["foldergame/create","game_id"],["class"=>"label label-primary"]);
+                    return $data;
                 }
             ],
             [
@@ -95,10 +94,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         $data .= 
                             "<div class='label label-default' id='$id'>". 
                                 $tag->name . 
-                                Html::a('<span class="glyphicon glyphicon-remove"></span>',["gametag/delete","tag_id"=>$tag->id,"game_id"=>$model->id]) . 
                             '</div> ';
                     }
-                    return $data . Html::a("+ Add Tag",["foldergame/create","game_id"],["class"=>"label label-primary"]);
+                    return $data;
                 }
             ],
             [

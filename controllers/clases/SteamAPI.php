@@ -4,6 +4,7 @@ namespace app\controllers\clases;
 
 use Yii;
 use app\models\Game;
+use app\models\Library;
 use app\models\GameGenre;
 use app\models\CategoryGame;
 use app\models\Category;
@@ -38,6 +39,10 @@ class SteamAPI{
             $g->name = $game->name;
             $g->img_icon_url = $game->img_icon_url;
             $g->img_logo_url = $game->img_logo_url;
+            $library = new Library();
+            $library->game_id = $game->appid;
+            $library->user_id = Yii::$app->user->id;
+            $library->save();
             if($g->save()){
                 $total++;
             }
@@ -69,6 +74,7 @@ class SteamAPI{
         $total = 0;
         $fail = 0;
         $data = null;
+        $model->update = (new \DateTime())->format("Y-m-d H:i:s");
         if($result === null)
             return $this->noStore($model);
         if(!isset($result->{$model->id}->data))

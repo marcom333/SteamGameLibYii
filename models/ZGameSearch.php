@@ -9,20 +9,10 @@ use app\models\Game;
 /**
  * GameSearch represents the model behind the search form of `app\models\Game`.
  */
-class GameSearch extends Game
+class ZGameSearch extends Game
 {
 
     public $cname, $gname, $tname;
-    private $isAdmin, $user_id;
-
-    public function setAdmin(){
-        $isAdmin = true;
-    }
-
-    public function setUser_id($id){
-        $this->user_id = $id;
-    }
-
 
     /**
      * {@inheritdoc}
@@ -64,26 +54,15 @@ class GameSearch extends Game
                     "game.platforms",
                     "game.initial",
                     "game.price_currency",
-                    'GROUP_CONCAT(DISTINCT category.name) cname',
-                    'GROUP_CONCAT(DISTINCT genre.name) gname',
-                    'GROUP_CONCAT(DISTINCT tag.name) tname',
+                    "GROUP_CONCAT( IF(type.name='Tag',data.name, NULL)) tname",
+                    "GROUP_CONCAT( IF(type.name='Genre',data.name, NULL)) gname",
+                    "GROUP_CONCAT( IF(type.name='Category',data.name, NULL)) cname",
                 ])->
             from('game')->
-            join('LEFT JOIN', 'game_genre', 'game_genre.game_id = game.id')->
-            join('LEFT JOIN', 'genre', 'genre.id = game_genre.genre_id')->
-            join('LEFT JOIN', 'category_game', 'category_game.game_id = game.id')->
-            join('LEFT JOIN', 'category', 'category.id = category_game.category_id')->
-            
-            join('LEFT JOIN', 'game_tag', 'game_tag.game_id = game.id')->
-            join('LEFT JOIN', 'tag', 'tag.id = game_tag.tag_id')->
-
+            join('LEFT JOIN', 'game_data', 'game_data.game_id = game.id')->
+            join('LEFT JOIN', 'data', 'data.id = game_data.data_id')->
+            join('LEFT JOIN', 'type', 'type.id = game_data.type_id')->
             groupBy("game.id");
-
-            if($this->isAdmin == false){
-                $query->join('LEFT JOIN', 'library', 'library.game_id = game.id')->
-                andFilterWhere(['=', 'library.user_id', $this->user_id]);
-            }
-
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -134,11 +113,16 @@ class GameSearch extends Game
         $query
             ->andFilterWhere(['like', 'game.name', $this->name])
             ->andFilterWhere(['like', 'controller_support', $this->controller_support])
-            ->andFilterWhere(['like', 'platforms', $this->platforms])
-            ->andFilterWhere(['like', 'genre.name', $this->gname])
-            ->andFilterWhere(['like', 'category.name', $this->cname])
-            ->andFilterWhere(['like', 'tag.name', $this->tname])
-        ;
+            ->andFilterWhere(['like', 'platforms', $this->platforms]);
+        if($this->gname){
+            $query->andFilterWhere(['like', 'data.name', $this->gname])->andFilterWhere(['=', 'type.name', 'Genre']);
+        }
+        if($this->cname){
+            $query->andFilterWhere(['like', 'data.name', $this->cname])->andFilterWhere(['=', 'type.name', 'Category']);
+        }
+        if($this->tname){
+            $query->andFilterWhere(['like', 'data.name', $this->tname])->andFilterWhere(['=', 'type.name', 'Tag']);
+        }
 
         return $dataProvider;
     }

@@ -62,13 +62,23 @@ php yii migrate/fresh
 
 ### Screenshots
 
+Filter your games with tags, category, genre and folders
+
 ![filter your games with tags, category, genre and folders](/readmeimg/lib001.jpg "screenshot")
 
-![can search in your library](/readmeimg/lib002.jpg "screenshot")
+You can search in your library
+
+![Can search in your library](/readmeimg/lib002.jpg "screenshot")
+
+You can create new accoun
 
 ![Can create new account](/readmeimg/newacc.jpg "screenshot")
 
+And login
+
 ![you can login](/readmeimg/login.jpg "screenshot")
+
+Game icon in web browser Tabs
 
 ![Game icon in Tabs](/readmeimg/tabicon.jpg "screenshot")
 

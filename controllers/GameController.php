@@ -294,7 +294,7 @@ class GameController extends Controller{
         else{
             $folder->andWhere(["is","folder_id",null]);
         }
-        if(isset($_POST['save']) && isset($_POST['name']) && $_POST['name']){
+        if(isset($_POST['name']) && $_POST['name']){
             $fold = new \app\models\Folder();
             $fold->folder_id = $path;
             $fold->name = $_POST['name'];
@@ -311,11 +311,13 @@ class GameController extends Controller{
             }
         }
         $current = \app\models\Folder::findOne($path);
+        if(Yii::$app->request->isAjax) 
+            return $this->renderAjax("folder",["folders"=>$folder->all(),"id"=>$id,"current"=>$current]);
         return $this->render("folder",["folders"=>$folder->all(),"id"=>$id,"current"=>$current]);
     }
 
     public function actionDeletefolder($id, $folder){ 
-        $model = \app\models\Folder::findOne($folder);
+        $model = \app\models\FolderGame::findOne(["folder_id"=>$folder, "game_id"=>$id]);
         if($model){ $model->delete(); }
         return $this->redirect(['view','id'=>$id]);
     }
@@ -330,6 +332,9 @@ class GameController extends Controller{
                 $gamefold->game_id = $id;
                 $gamefold->save();
             }
+        }
+        if(Yii::$app->request->isAjax){
+            return $this->actionView($id);
         }
         return $this->redirect(['view','id'=>$id]);
     }

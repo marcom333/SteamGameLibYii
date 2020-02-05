@@ -1,8 +1,10 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\DetailView;
 use yii\bootstrap\Carousel;
+
 /* @var $this yii\web\View */
 /* @var $model app\models\Game */
 
@@ -11,18 +13,18 @@ $this->params['breadcrumbs'][] = ['label' => 'Search', 'url' => ['search']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
-<div class="game-view">
+<div id="game_content" class="game-view">
 
     <h1><img src="https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/<?= $model->id ?>/<?= $model->img_icon_url ?>.jpg"><?= Html::encode($this->title) ?></h1>
 
     <p>
         <?= Html::a("<span class=\"glyphicon glyphicon-refresh\"></span> Update", ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
         <?= Html::a('<span class="glyphicon glyphicon-play-circle"></span> Play', "steam://run/" . $model->id, ['class' => 'btn btn-success']) ?>
-        <?= Html::a( Html::img("@web/img/steam-logo.png",["height"=>"20px"]) . " Store ", "https://store.steampowered.com/app/" . $model->id . "/",["class"=>"btn btn-default"]) ?>
-        <?= Html::a( Html::img("@web/img/steam-db-logo.png",["height"=>"20px"]) . "DB" , "https://steamdb.info/app/$model->id/" , ["class"=>"btn btn-default"]); ?>
+        <?= Html::a( Html::img("@web/img/steam-logo.png",["height"=>"20px"]) . " Store ", "https://store.steampowered.com/app/" . $model->id . "/",["class"=>"btn btn-default", "target"=>"_blank"]) ?>
+        <?= Html::a( Html::img("@web/img/steam-db-logo.png",["height"=>"20px"]) . "DB" , "https://steamdb.info/app/$model->id/" , ["class"=>"btn btn-default", "target"=>"_blank"]); ?>
     </p>
 
-    <div class="col-md-offset-3 col-md-6">
+    <div class="col-md-offset-1 col-md-10">
         <?php 
             $screens = [];
             foreach($model->screenshots as $screen){
@@ -131,20 +133,23 @@ $this->params['breadcrumbs'][] = $this->title;
                                 '</div> ';
                         }
                     }
-                    return $data . Html::a("+ Add Folder",["game/addfolder","id"=>$model->id],["class"=>"label label-primary"]);
+                    return $data . "<span class='label label-primary' id='modalturbo' onclick=\"$.get('" . Url::to(["game/addfolder","id"=>$model->id]) . "', function(data, status){
+                            $('#data_post').html(data);
+                            $('#admin').modal();
+                        });\">+ Add Folder</span>";
                 }
             ]
         ],
     ]) ?>
     </div>
-<script>
-    (function() {
-        var link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-        link.type = 'image/x-icon';
-        link.rel = 'shortcut icon';
-        link.href = '<?= "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/".$model->id."/" . $model->img_logo_url . ".jpg" ?>';
-        document.getElementsByTagName('head')[0].appendChild(link);
-    })();
-</script>
+    <script>
+        (function() {
+            var link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+            link.type = 'image/x-icon';
+            link.rel = 'shortcut icon';
+            link.href = '<?= "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/".$model->id."/" . $model->img_logo_url . ".jpg" ?>';
+            document.getElementsByTagName('head')[0].appendChild(link);
+        })();
+    </script>
 
 </div>

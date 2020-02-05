@@ -145,3 +145,12 @@ a.desc:after {
 .label.label-default > a{
     color: red;
 }
+
+.pointer{
+    cursor: pointer;
+    text-decoration: underline;
+}
+.pointer:hover{
+    cursor: pointer;
+    color: gray;
+}

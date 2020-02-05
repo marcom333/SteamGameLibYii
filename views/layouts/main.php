@@ -7,6 +7,7 @@ use app\widgets\Alert;
 use yii\helpers\Html;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
+use yii\bootstrap\Modal;
 use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
 
@@ -82,7 +83,11 @@ AppAsset::register($this);
         <p class="pull-right">I made this with Yii 2 Framework.</p>
     </div>
 </footer>
-
+<?php Modal::begin(['header' => '<h2>Select Folder</h2>',"id"=>"admin"]); ?>
+<div id="data_post">
+    Cargando ... 
+</div>
+<?php Modal::end(); ?>
 <?php $this->endBody() ?>
 </body>
 </html>

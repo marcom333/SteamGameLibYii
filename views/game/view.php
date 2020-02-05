@@ -105,21 +105,31 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => function($model){
                     $data = "";
                     foreach($model->folder as $folder){
-                        $id = "game_folder_".$folder->id;
-                        $data .= 
-                            "<div class='label label-default' id='$id'>". 
-                                $folder->name . 
-                                
-                                Html::a(
-                                    '<span class="glyphicon glyphicon-remove"></span>', 
-                                    ["deletefolder","folder"=>$folder->id,"id"=>$model->id], [
-                                    'id'=>"folder".$folder->id,
-                                    'data' => [
-                                        'confirm' => 'Remove folder?',
-                                        'method' => 'post',
-                                    ],
-                                ]).
-                            '</div> ';
+                        if($folder->user_id == Yii::$app->user->id){
+                            $parent = $folder->parent;
+                            $allName = $folder->name ;
+                            while($parent->name != "Root"){
+                                $allName = $parent->name . " / " . $allName;
+                                $parent= $parent->parent;
+                            }
+                            $parent_id = $folder->folder_id;
+                            
+                            $id = "game_folder_".$folder->id;
+                            $data .= 
+                                "<div class='label label-default' id='$id'>". 
+                                    $allName. 
+                                    
+                                    Html::a(
+                                        '<span class="glyphicon glyphicon-remove"></span>', 
+                                        ["deletefolder","folder"=>$folder->id,"id"=>$model->id], [
+                                        'id'=>"folder".$folder->id,
+                                        'data' => [
+                                            'confirm' => 'Remove folder?',
+                                            'method' => 'post',
+                                        ],
+                                    ]).
+                                '</div> ';
+                        }
                     }
                     return $data . Html::a("+ Add Folder",["game/addfolder","id"=>$model->id],["class"=>"label label-primary"]);
                 }

@@ -41,21 +41,21 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="clickable hidden" id="genre-on" onclick="$('#genre-off').toggleClass('hidden'); $('#genre-on').toggleClass('hidden'); $('#genre-data-on').toggleClass('hidden');"> - Genre</div>
             <div class="clickable hidden" id="genre-data-on">
                 <?php foreach($genres as $gen): ?>
-                    <script>gen<?= $gen->id; ?>=false</script>
+                    <script>gen<?= $gen['id']; ?>=false</script>
                     <div class="clickable" onclick="
-                        gen<?= $gen->id; ?>=!gen<?= $gen->id; ?>;
-                        if(gen<?= $gen->id; ?>){
-                            $.post('<?= Url::to(["game/genre","id"=>$gen->id]); ?>', 
+                        gen<?= $gen['id']; ?>=!gen<?= $gen['id']; ?>;
+                        if(gen<?= $gen['id']; ?>){
+                            $.post('<?= Url::to(["game/genre","id"=>$gen['id']]); ?>', 
                                 function( data ) {
-                                    $('#<?= 'gen' . $gen->id ?>').html( data );
+                                    $('#<?= 'gen' . $gen['id'] ?>').html( data );
                                 }
                             );
                         }
                         else{
-                            $('#<?= 'gen' . $gen->id ?>').html('');
+                            $('#<?= 'gen' . $gen['id'] ?>').html('');
                         }
-                    ">&nbsp;&nbsp;&nbsp; + <?= $gen->name ?> </div>
-                    <div id="<?= 'gen' . $gen->id ?>"></div>
+                    ">&nbsp;&nbsp;&nbsp; + <?= $gen['name'] ?> </div>
+                    <div id="<?= 'gen' . $gen['id'] ?>"></div>
                 <?php endforeach; ?>
             </div>
         </div>
@@ -65,21 +65,23 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="clickable hidden" id="tag-on" onclick="$('#tag-off').toggleClass('hidden'); $('#tag-on').toggleClass('hidden'); $('#tag-data-on').toggleClass('hidden');"> - Tag</div>
             <div class="clickable hidden" id="tag-data-on">
                 <?php foreach($tags as $tag): ?>
-                    <script>tag<?= $tag->id; ?>=false</script>
-                    <div class="clickable" onclick="
-                        tag<?= $tag->id; ?>=!tag<?= $tag->id; ?>;
-                        if(tag<?= $tag->id; ?>){
-                            $.post('<?= Url::to(["game/tag","id"=>$tag->id]); ?>', 
-                                function( data ) {
-                                    $('#<?= 'tag' . $tag->id ?>').html( data );
-                                }
-                            );
-                        }
-                        else{
-                            $('#<?= 'tag' . $tag->id ?>').html('');
-                        }
-                    ">&nbsp;&nbsp;&nbsp; + <?= $tag->name ?> </div>
-                    <div id="<?= 'tag' . $tag->id ?>"></div>
+                    <?php if($tag['id']): ?>
+                        <script>tag<?= $tag['id']; ?>=false</script>
+                        <div class="clickable" onclick="
+                            tag<?= $tag['id']; ?>=!tag<?= $tag['id']; ?>;
+                            if(tag<?= $tag['id']; ?>){
+                                $.post('<?= Url::to(["game/tag","id"=>$tag['id']]); ?>', 
+                                    function( data ) {
+                                        $('#<?= 'tag' . $tag['id'] ?>').html( data );
+                                    }
+                                );
+                            }
+                            else{
+                                $('#<?= 'tag' . $tag['id'] ?>').html('');
+                            }
+                        ">&nbsp;&nbsp;&nbsp; + <?= $tag['name'] ?> </div>
+                        <div id="<?= 'tag' . $tag['id'] ?>"></div>
+                    <?php endif;?>
                 <?php endforeach; ?>
             </div>
         </div>
@@ -89,21 +91,21 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="clickable hidden" id="category-on" onclick="$('#category-off').toggleClass('hidden'); $('#category-on').toggleClass('hidden'); $('#category-data-on').toggleClass('hidden');"> - Category</div>
             <div class="clickable hidden" id="category-data-on">
                 <?php foreach($categories as $cat): ?>
-                    <script>cat<?= $cat->id; ?>=false</script>
+                    <script>cat<?= $cat['id']; ?>=false</script>
                     <div class="clickable" onclick="
-                        cat<?= $cat->id; ?>=!cat<?= $cat->id; ?>;
-                        if(cat<?= $cat->id; ?>){
-                            $.post('<?= Url::to(["game/category","id"=>$cat->id]); ?>', 
+                        cat<?= $cat['id']; ?>=!cat<?= $cat['id']; ?>;
+                        if(cat<?= $cat['id']; ?>){
+                            $.post('<?= Url::to(["game/category","id"=>$cat['id']]); ?>', 
                                 function( data ) {
-                                    $('#<?= 'category' . $cat->id ?>').html( data );
+                                    $('#<?= 'category' . $cat['id'] ?>').html( data );
                                 }
                             );
                         }
-                        else{
-                            $('#<?= 'category' . $cat->id ?>').html('');
+                        else{   
+                            $('#<?= 'category' . $cat['id'] ?>').html('');
                         }
-                    ">&nbsp;&nbsp;&nbsp; + <?= $cat->name ?> </div>
-                    <div id="<?= 'category' . $cat->id ?>"></div>
+                    ">&nbsp;&nbsp;&nbsp; + <?= $cat['name'] ?> </div>
+                    <div id="<?= 'category' . $cat['id'] ?>"></div>
                 <?php endforeach; ?>
             </div>
         </div>

@@ -45,4 +45,20 @@ class Folder extends \yii\db\ActiveRecord
             'user_id' => 'User ID',
         ];
     }
+
+
+    public function getParent(){
+        $parent = Folder::findOne(["id"=>$this->folder_id]);
+        if($parent){
+            return $parent;
+        }
+        else{
+            return new class {
+                public $name;
+                public function __construct(){
+                    $this->name = "Root";
+                }
+            };
+        }
+    }
 }

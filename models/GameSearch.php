@@ -59,7 +59,6 @@ class GameSearch extends Game
                     "game.id",
                     "game.name name",
                     "game.img_logo_url",
-                    "game.required_age",
                     "game.controller_support",
                     "game.platforms",
                     "game.initial",
@@ -73,7 +72,6 @@ class GameSearch extends Game
             join('LEFT JOIN', 'genre', 'genre.id = game_genre.genre_id')->
             join('LEFT JOIN', 'category_game', 'category_game.game_id = game.id')->
             join('LEFT JOIN', 'category', 'category.id = category_game.category_id')->
-            
             join('LEFT JOIN', 'game_tag', 'game_tag.game_id = game.id')->
             join('LEFT JOIN', 'tag', 'tag.id = game_tag.tag_id')->
 

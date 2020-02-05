@@ -48,7 +48,7 @@ class GameController extends Controller{
     public function actionSearch($admin = false){
         $searchModel = new GameSearch();
         
-        if(Yii::$app->user->identity->rol == 1  && $self){
+        if(Yii::$app->user->identity->rol == 1  && $admin){
             $searchModel->setAdmin();
         }
         $searchModel->setUser_id(Yii::$app->user->id);
@@ -83,6 +83,7 @@ class GameController extends Controller{
      * @return mixed
      */
     public function actionCreate(){
+        ini_set('memory_limit', '1024M');
         $data = (new clases\SteamAPI)->getOwnedGames(Yii::$app->user->id);
 
         return $this->redirect(['search']);
@@ -149,11 +150,39 @@ class GameController extends Controller{
      * @return mixed
      */
     public function actionLibrary(){
+        $userId = Yii::$app->user->id;
+        $genres = (new \yii\db\Query())->
+            select(["genre.name","genre.id"])->
+            from("library")->
+            join('LEFT JOIN', 'game', 'game.id = library.game_id')->
+            join('LEFT JOIN', 'game_genre', 'game_genre.game_id = game.id')->
+            join('LEFT JOIN', 'genre', 'genre.id = game_genre.genre_id')->
+            where(["user_id"=>$userId])->
+            groupBy(["genre.name"])->orderBy(["genre.name"=>SORT_ASC])->all();
+
+        $tags = (new \yii\db\Query())->
+            select(["tag.name","tag.id"])->
+            from("library")->
+            join('LEFT JOIN', 'game', 'game.id = library.game_id')->
+            join('LEFT JOIN', 'game_tag', 'game_tag.game_id = game.id')->
+            join('LEFT JOIN', 'tag', 'tag.id = game_tag.tag_id')->
+            where(["user_id"=>$userId])->
+            groupBy(["tag.name"])->orderBy(["tag.name"=>SORT_ASC])->all();
+
+        $categories = (new \yii\db\Query())->
+            select(["category.name","category.id"])->
+            from("library")->
+            join('LEFT JOIN', 'game', 'game.id = library.game_id')->
+            join('LEFT JOIN', 'category_game', 'category_game.game_id = game.id')->
+            join('LEFT JOIN', 'category', 'category.id = category_game.category_id')->
+            where(["user_id"=>$userId])->
+            groupBy(["category.name"])->orderBy(["category.name"=>SORT_ASC])->all();
+
         return $this->render('library', [
-            "genres"=>\app\models\Genre::find()->all(),
-            "categories"=>\app\models\Category::find()->all(),
-            "tags"=>\app\models\Tag::find()->all(),
-            "folders"=>\app\models\Folder::find()->where(['is', 'folder_id' , null])->all(),
+            "genres"=>$genres,//\app\models\Genre::find()->all(),
+            "categories"=>$categories,
+            "tags"=>$tags,
+            "folders"=>\app\models\Folder::find()->where(['is', 'folder_id' , null])->andWhere(["user_id"=>Yii::$app->user->id])->all(),
         ]);
     }
 
@@ -162,7 +191,8 @@ class GameController extends Controller{
      * @return mixed
      */
     public function actionFolder($id){   
-        $subFolder = \app\models\Folder::find()->where(["folder_id"=>$id])->all();
+        $subFolder = \app\models\Folder::find()->where(["folder_id"=>$id])->andWhere(["user_id"=>Yii::$app->user->id])->all();
+        
         $games = (new \yii\db\Query())->select([
                 "game.id",
                 "game.name name",
@@ -172,7 +202,9 @@ class GameController extends Controller{
             join('LEFT JOIN', 'folder_game', 'folder_game.game_id = game.id')->
             join('LEFT JOIN', 'folder', 'folder.id = folder_game.folder_id')->
             groupBy("game.id")->
-            andFilterWhere(['like', 'folder.id', $id])->all();
+            andFilterWhere(['like', 'folder.id', $id])->
+            join('LEFT JOIN', 'library', 'library.game_id = game.id')->
+            andFilterWhere(['=', 'library.user_id', Yii::$app->user->id])->all();
         
         $level = $this->getFolderLevel($id,1);
         
@@ -202,8 +234,10 @@ class GameController extends Controller{
         from('game')->
         join('LEFT JOIN', 'game_genre', 'game_genre.game_id = game.id')->
         join('LEFT JOIN', 'genre', 'genre.id = game_genre.genre_id')->
+        andFilterWhere(['=', 'genre.id', $id])->
+        join('LEFT JOIN', 'library', 'library.game_id = game.id')->
+        andFilterWhere(['=', 'library.user_id', Yii::$app->user->id])->
         groupBy("game.id");
-        $games->andFilterWhere(['=', 'genre.id', $id]);
 
         return $this->renderPartial("_games",["games"=>$games->all()]);
     }
@@ -223,6 +257,8 @@ class GameController extends Controller{
         from('game')->
         join('LEFT JOIN', 'category_game', 'category_game.game_id = game.id')->
         join('LEFT JOIN', 'category', 'category.id = category_game.category_id')->
+        join('LEFT JOIN', 'library', 'library.game_id = game.id')->
+        andFilterWhere(['=', 'library.user_id', Yii::$app->user->id])->
         groupBy("game.id")->andFilterWhere(['=', 'category.id', $id]);
 
         return $this->renderPartial("_games",["games"=>$games->all()]);
@@ -243,7 +279,9 @@ class GameController extends Controller{
         from('game')->
         join('LEFT JOIN', 'game_tag', 'game_tag.game_id = game.id')->
         join('LEFT JOIN', 'tag', 'tag.id = game_tag.tag_id')->
-        groupBy("game.id")->andFilterWhere(['=', 'tag.id', $id]);
+        groupBy("game.id")->andFilterWhere(['=', 'tag.id', $id])->
+        join('LEFT JOIN', 'library', 'library.game_id = game.id')->
+        andFilterWhere(['=', 'library.user_id', Yii::$app->user->id]);
 
         return $this->renderPartial("_games",["games"=>$games->all()]);
     }
@@ -256,35 +294,43 @@ class GameController extends Controller{
         else{
             $folder->andWhere(["is","folder_id",null]);
         }
-        if(isset($_POST['addfolder']) && isset($_POST['name']) && $_POST['name']){
-            $fold = new \app\models\Folder();
-            $fold->folder_id = $path;
-            $fold->name = $_POST['name'];
-            $fold->user_id = Yii::$app->user->id;
-            if($fold->save()){}
-
-        }
-        if(isset($_POST['savefolder']) && isset($_POST['name']) && $_POST['name']){
+        if(isset($_POST['save']) && isset($_POST['name']) && $_POST['name']){
             $fold = new \app\models\Folder();
             $fold->folder_id = $path;
             $fold->name = $_POST['name'];
             $fold->user_id = Yii::$app->user->id;
             if($fold->save()){
-                $gamefold = new \app\models\FolderGame();
-                $gamefold->folder_id = $fold->id;
-                $gamefold->game_id = $id;
-                if($gamefold->save()){
-                    return $this->redirect(['view','id'=>$id]);
+                if(isset($_POST['option']) && $_POST['option']){
+                    $gamefold = new \app\models\FolderGame();
+                    $gamefold->folder_id = $fold->id;
+                    $gamefold->game_id = $id;
+                    if($gamefold->save()){
+                        return $this->redirect(['view','id'=>$id]);
+                    }
                 }
             }
-
         }
-        return $this->render("folder",["folders"=>$folder->all(),"id"=>$id]);
+        $current = \app\models\Folder::findOne($path);
+        return $this->render("folder",["folders"=>$folder->all(),"id"=>$id,"current"=>$current]);
     }
 
     public function actionDeletefolder($id, $folder){ 
         $model = \app\models\Folder::findOne($folder);
         if($model){ $model->delete(); }
+        return $this->redirect(['view','id'=>$id]);
+    }
+
+    public function actionSelectfolder($id, $folder_id){ 
+        $model = \app\models\Folder::findOne($folder_id);
+        if($model){ 
+            $game = Game::findOne($id);
+            if($game){
+                $gamefold = new \app\models\FolderGame();
+                $gamefold->folder_id = $model->id;
+                $gamefold->game_id = $id;
+                $gamefold->save();
+            }
+        }
         return $this->redirect(['view','id'=>$id]);
     }
 }

@@ -60,6 +60,18 @@ To redefine the schema of the data base you should use this command:
 php yii migrate/fresh
 ~~~
 
+### Screenshots
+
+![filter your games with tags, category, genre and folders](/readmeimg/lib001.jpg "screenshot")
+
+![can search in your library](/readmeimg/lib002.jpg "screenshot")
+
+![Can create new account](/readmeimg/newacc.jpg "screenshot")
+
+![you can login](/readmeimg/login.jpg "screenshot")
+
+![Game icon in Tabs](/readmeimg/tabicon.jpg "screenshot")
+
 For Developers
 -------------------
 
@@ -79,9 +91,9 @@ For Developers
 
 
 ### TO DO
-* * [ ] Add folders to games
-* * [ ] Add folders to folders :u
-* * [ ] Remove folders to a game
+* * [x] Add folders to games
+* * [x] Add folders to folders :u
+* * [x] Remove folders to a game
 * * [x] Make it online
     * * [x] Make game libraries
     * * [ ] sign in through steam

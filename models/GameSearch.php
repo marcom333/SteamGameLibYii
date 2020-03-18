@@ -31,7 +31,7 @@ class GameSearch extends Game
     {
         return [
             [['id', 'required_age', 'initial'], 'integer'],
-            [['name', 'controller_support','gname', 'cname', 'tname', 'platforms',], 'safe'],
+            [['name', 'controller_support',/*'gname', 'cname', 'tname',*/"temp_genre","temp_tag",'temp_category', 'platforms',], 'safe'],
         ];
     }
 
@@ -53,7 +53,7 @@ class GameSearch extends Game
      */
     public function search($params)
     {
-        $query = (new \yii\db\Query())->
+        $query = Game::find();/*(new \yii\db\Query())->
             select(
                 [
                     "game.id",
@@ -80,7 +80,7 @@ class GameSearch extends Game
             if($this->isAdmin == false){
                 $query->join('LEFT JOIN', 'library', 'library.game_id = game.id')->
                 andFilterWhere(['=', 'library.user_id', $this->user_id]);
-            }
+            }*/
 
 
         $dataProvider = new ActiveDataProvider([
@@ -96,7 +96,7 @@ class GameSearch extends Game
         if (!$this->validate()) {
             return $dataProvider;
         }
-
+        /*
         $dataProvider->sort->attributes['name'] = [
             'asc' => ['game.name' => SORT_ASC],
             'desc' => ['game.name' => SORT_DESC],
@@ -120,7 +120,7 @@ class GameSearch extends Game
         $dataProvider->sort->attributes['initial'] = [
             'asc' => ['game.initial' => SORT_ASC],
             'desc' => ['game.initial' => SORT_DESC],
-        ];
+        ];*/
 
         // grid filtering conditions
         $query->andFilterWhere([
@@ -133,9 +133,13 @@ class GameSearch extends Game
             ->andFilterWhere(['like', 'game.name', $this->name])
             ->andFilterWhere(['like', 'controller_support', $this->controller_support])
             ->andFilterWhere(['like', 'platforms', $this->platforms])
-            ->andFilterWhere(['like', 'genre.name', $this->gname])
+            ->andFilterWhere(['like', 'temp_genre', $this->temp_genre])
+            ->andFilterWhere(['like', 'temp_tag', $this->temp_tag])
+            ->andFilterWhere(['like', 'temp_category', $this->temp_category])
+            /*->andFilterWhere(['like', 'genre.name', $this->gname])
             ->andFilterWhere(['like', 'category.name', $this->cname])
-            ->andFilterWhere(['like', 'tag.name', $this->tname])
+            ->andFilterWhere(['like', 'tag.name', $this->tname])*/
+
         ;
 
         return $dataProvider;

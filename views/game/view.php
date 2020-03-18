@@ -40,23 +40,81 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'update',
+
+            "temp_genre",
+            "temp_category",
+            "temp_tag",
+            [
+                'attribute' => 'folder',
+                "format"=>"raw",
+                'value' => function($model){
+                    $data = "";
+                    foreach($model->folderGame as $gfolder){
+                        $folder = $gfolder->folder;
+                        if($folder->user_id == Yii::$app->user->id){
+                            $parent = $folder->parent;
+                            $allName = $folder->name ;
+                            while($parent->name != "Root"){
+                                $allName = $parent->name . " / " . $allName;
+                                $parent= $parent->parent;
+                            }
+                            $parent_id = $folder->folder_id;
+                            
+                            $id = "game_folder_".$folder->id;
+                            $data .= 
+                                "<div class='label label-default' id='$id'>". 
+                                    $allName. 
+                                    
+                                    Html::a(
+                                        '<span class="glyphicon glyphicon-remove"></span>', 
+                                        ["deletefolder","folder"=>$folder->id,"id"=>$model->id], [
+                                        'id'=>"folder".$folder->id,
+                                        'data' => [
+                                            'confirm' => 'Remove folder?',
+                                            'method' => 'post',
+                                        ],
+                                    ]).
+                                '</div> ';
+                        }
+                    }
+                    return $data . "<span class='label label-primary' id='modalturbo' onclick=\"$.get('" . Url::to(["game/addfolder","id"=>$model->id]) . "', function(data, status){
+                            $('#data_post').html(data);
+                            $('#admin').modal();
+                        });\">+ Add Folder</span>";
+                }
+            ],
+            'platforms',
             'required_age',
             'controller_support',
-            'detailed_description:html',
-            'about_the_game:html',
+            [
+                "attribute"=>"metacritic",
+                "format"=>"raw",
+                "value"=> function($model){
+                    $meta = $model->metacritic;
+                    if($meta){
+                        $code = "btn btn-";
+                        if($meta->score > 70){ $code .= "success"; }
+                        elseif($meta->score <=70){ $code .= "warning"; }
+                        else{ $code .= "danger"; }
+                        return Html::a("<b>".$meta->score."</b>",$meta->url,["class"=> $code]);
+                    }
+                    return "NA";
+                }
+            ],
             'pc_requirements_minimum:html',
             'pc_requirements_recomended:html',
+            'about_the_game:html',
+            'detailed_description:html',
             'developers',
             'publishers',
-            'platforms',
             [
                 'attribute' => 'price',
                 'value' => function($model){
                     return "$" .  $model->price . " " . $model->price_currency;
                 }
             ],
-            [
+            'update',
+            /*[
                 'attribute' => 'genre',
                 'format'=>'html',
                 'value' => function($model){
@@ -100,45 +158,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
                     return $data;
                 }
-            ],
-            [
-                'attribute' => 'folder',
-                "format"=>"raw",
-                'value' => function($model){
-                    $data = "";
-                    foreach($model->folder as $folder){
-                        if($folder->user_id == Yii::$app->user->id){
-                            $parent = $folder->parent;
-                            $allName = $folder->name ;
-                            while($parent->name != "Root"){
-                                $allName = $parent->name . " / " . $allName;
-                                $parent= $parent->parent;
-                            }
-                            $parent_id = $folder->folder_id;
-                            
-                            $id = "game_folder_".$folder->id;
-                            $data .= 
-                                "<div class='label label-default' id='$id'>". 
-                                    $allName. 
-                                    
-                                    Html::a(
-                                        '<span class="glyphicon glyphicon-remove"></span>', 
-                                        ["deletefolder","folder"=>$folder->id,"id"=>$model->id], [
-                                        'id'=>"folder".$folder->id,
-                                        'data' => [
-                                            'confirm' => 'Remove folder?',
-                                            'method' => 'post',
-                                        ],
-                                    ]).
-                                '</div> ';
-                        }
-                    }
-                    return $data . "<span class='label label-primary' id='modalturbo' onclick=\"$.get('" . Url::to(["game/addfolder","id"=>$model->id]) . "', function(data, status){
-                            $('#data_post').html(data);
-                            $('#admin').modal();
-                        });\">+ Add Folder</span>";
-                }
-            ]
+            ],*/
         ],
     ]) ?>
     </div>

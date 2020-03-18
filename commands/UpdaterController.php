@@ -19,16 +19,30 @@ class UpdaterController extends Controller
      */
     public function actionRun()
     {
-        $today = new \DateTime("-2 days");
-        $games = Game::find()->where(["<","update",$today->format("Y-m-d")])->orWhere(["is","update",null])->limit(50)->orderBy(["id"=>SORT_ASC])->all();
+        $today = new \DateTime("-5 days");
+        $games = Game::find()->
+                    //where(["<","update",$today->format("Y-m-d")])->
+                    //orWhere(["is","update",null])->
+                    Where(["temp_tag"=>""])->
+                    limit(150)->
+                    orderBy(["id"=>SORT_ASC])->
+                    all();
         $api = new SteamApi();
         echo "First: " . $games[0]->id;
         echo " Last: " .  $games[sizeof($games)-1]->id;
         echo " ... ";
         foreach($games as $game){
             $api->updateGameInfo($game);
+            echo "\nUpdating " . $game->name . $game->temp_tag . "\n";
         }
-        echo "Done";
+        echo "Done\n";
+
+        $status = Game::find()->select(["dayofmonth(`update`) as day","count(*) as total"])->groupBy(["dayofmonth(`update`)"])->all();
+
+        foreach($status as $row){
+            echo "[Day = ". ($row->day?$row->day:"Null") .", Total = $row->total], ";
+        }
+
         return ExitCode::OK;
     }
 }

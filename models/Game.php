@@ -26,6 +26,7 @@ use Yii;
  */
 class Game extends \yii\db\ActiveRecord
 {
+    public $day, $total;
     /**
      * {@inheritdoc}
      */
@@ -73,6 +74,9 @@ class Game extends \yii\db\ActiveRecord
             'price' => 'Price',
             'platforms' => 'Platforms',
             'background' => 'Background',
+            'temp_genre'=>'Genres',
+            'temp_tag'=>'Tags',
+            'temp_category'=>'Categories',
         ];
     }
 
@@ -92,7 +96,16 @@ class Game extends \yii\db\ActiveRecord
     public function getTag(){
         return $this->hasMany(Tag::className(),['id' => 'tag_id'])->viaTable('game_tag', ['game_id' => 'id']);
     }
+
+    public function getFolderGame(){
+        return $this->hasMany(FolderGame::className(),["game_id"=>"id"]);
+    }
+
     public function getFolder(){
         return $this->hasMany(Folder::className(),['id' => 'folder_id'])->viaTable('folder_game', ['game_id' => 'id']);
+    }
+
+    public function getMetacritic(){
+        return $this->hasOne(Metacritic::className(),['game_id' => 'id']);
     }
 }

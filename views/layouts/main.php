@@ -48,6 +48,7 @@ AppAsset::register($this);
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
             ['label' => 'Home', 'url' => ['/site/index']],
+            ['label' => 'Random', 'url' => ['/game/random']],
             ['label' => 'Search', 'url' => ['/game/search']],
             ['label' => 'Library', 'url' => ['/game/library']],
             Yii::$app->user->isGuest ? (

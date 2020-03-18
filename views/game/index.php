@@ -38,7 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     "value"=>function($model){
                         return "$" . ($model['initial']/100)  . " " . $model['price_currency'];
                     }
-                ],
+                ],/*
                 [
                     "attribute"=>'gname',
                     "label"=>"Genre",
@@ -59,7 +59,10 @@ $this->params['breadcrumbs'][] = $this->title;
                     "value"=>function($model){
                         return str_replace(",",", ", $model["tname"]);
                     }
-                ],
+                ],*/
+                'temp_category',
+                'temp_genre',
+                'temp_tag',
                 [
                     'class' => 'yii\grid\ActionColumn',
                     'visible'=> true,

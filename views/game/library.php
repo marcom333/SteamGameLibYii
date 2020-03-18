@@ -45,7 +45,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class="clickable" onclick="
                         gen<?= $gen['id']; ?>=!gen<?= $gen['id']; ?>;
                         if(gen<?= $gen['id']; ?>){
-                            $.post('<?= Url::to(["game/genre","id"=>$gen['id']]); ?>', 
+                            $.post('<?= Url::to(["game/genre","id"=>$gen['name']]); ?>', 
                                 function( data ) {
                                     $('#<?= 'gen' . $gen['id'] ?>').html( data );
                                 }
@@ -70,7 +70,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         <div class="clickable" onclick="
                             tag<?= $tag['id']; ?>=!tag<?= $tag['id']; ?>;
                             if(tag<?= $tag['id']; ?>){
-                                $.post('<?= Url::to(["game/tag","id"=>$tag['id']]); ?>', 
+                                $.post('<?= Url::to(["game/tag","id"=>$tag['name']]); ?>', 
                                     function( data ) {
                                         $('#<?= 'tag' . $tag['id'] ?>').html( data );
                                     }
@@ -95,7 +95,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class="clickable" onclick="
                         cat<?= $cat['id']; ?>=!cat<?= $cat['id']; ?>;
                         if(cat<?= $cat['id']; ?>){
-                            $.post('<?= Url::to(["game/category","id"=>$cat['id']]); ?>', 
+                            $.post('<?= Url::to(["game/category","id"=>$cat['name']]); ?>', 
                                 function( data ) {
                                     $('#<?= 'category' . $cat['id'] ?>').html( data );
                                 }

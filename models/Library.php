@@ -42,4 +42,8 @@ class Library extends \yii\db\ActiveRecord
             'user_id' => 'User ID',
         ];
     }
+
+    public function getGame(){
+        return $this->hasOne(Game::className(),["id"=>"game_id"]);
+    }
 }

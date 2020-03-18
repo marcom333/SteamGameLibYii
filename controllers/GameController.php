@@ -5,7 +5,10 @@ namespace app\controllers;
 use Yii;
 use app\models\Game;
 use app\models\GameSearch;
-use app\models\ZGameSearch;
+use app\models\Tag;
+use app\models\Genre;
+use app\models\Category;
+use app\models\Library;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -151,33 +154,39 @@ class GameController extends Controller{
      */
     public function actionLibrary(){
         $userId = Yii::$app->user->id;
+
+        $genres = Genre::find()->all();
+        /*
         $genres = (new \yii\db\Query())->
             select(["genre.name","genre.id"])->
-            from("library")->
-            join('LEFT JOIN', 'game', 'game.id = library.game_id')->
-            join('LEFT JOIN', 'game_genre', 'game_genre.game_id = game.id')->
-            join('LEFT JOIN', 'genre', 'genre.id = game_genre.genre_id')->
+            from("genre")->
+            //join('LEFT JOIN', 'game_genre', 'game_genre.genre_id = genre.id')->
+            join('LEFT JOIN', 'game', 'game.temp_genre LIKE CONCAT("%", genre.name, "%")')->
+            join('LEFT JOIN', 'library', 'library.game_id = game.id')->//game_genre.game_id')->
             where(["user_id"=>$userId])->
-            groupBy(["genre.name"])->orderBy(["genre.name"=>SORT_ASC])->all();
-
+            groupBy(["genre.name"])->
+            orderBy(["genre.name"=>SORT_ASC])->all();*/
+        $tags = Tag::Find()->all();/*
         $tags = (new \yii\db\Query())->
             select(["tag.name","tag.id"])->
-            from("library")->
-            join('LEFT JOIN', 'game', 'game.id = library.game_id')->
-            join('LEFT JOIN', 'game_tag', 'game_tag.game_id = game.id')->
-            join('LEFT JOIN', 'tag', 'tag.id = game_tag.tag_id')->
+            from("tag")->
+            //join('LEFT JOIN', 'game_tag', 'game_tag.tag_id = tag.id')->
+            join('LEFT JOIN', 'game', 'game.temp_tag LIKE CONCAT("%", tag.name, "%")')->
+            join('LEFT JOIN', 'library', 'library.game_id = game.id')->//game_tag.game_id')->
             where(["user_id"=>$userId])->
             groupBy(["tag.name"])->orderBy(["tag.name"=>SORT_ASC])->all();
-
+*/
+        $categories = Category::find()->all();
+            /*
         $categories = (new \yii\db\Query())->
             select(["category.name","category.id"])->
-            from("library")->
-            join('LEFT JOIN', 'game', 'game.id = library.game_id')->
-            join('LEFT JOIN', 'category_game', 'category_game.game_id = game.id')->
-            join('LEFT JOIN', 'category', 'category.id = category_game.category_id')->
+            from("category")->
+            //join('LEFT JOIN', 'category_game', 'category_game.category_id = category.id')->
+            join('LEFT JOIN', 'game', 'game.temp_category LIKE CONCAT("%", category.name, "%")')->
+            join('LEFT JOIN', 'library', 'library.game_id = game.id')->// category_game.game_id')->
             where(["user_id"=>$userId])->
-            groupBy(["category.name"])->orderBy(["category.name"=>SORT_ASC])->all();
-
+            groupBy(["category.name"])->orderBy(["category.name"=>SORT_ASC])->all();*/
+            
         return $this->render('library', [
             "genres"=>$genres,//\app\models\Genre::find()->all(),
             "categories"=>$categories,
@@ -204,7 +213,7 @@ class GameController extends Controller{
             groupBy("game.id")->
             andFilterWhere(['like', 'folder.id', $id])->
             join('LEFT JOIN', 'library', 'library.game_id = game.id')->
-            andFilterWhere(['=', 'library.user_id', Yii::$app->user->id])->all();
+            andFilterWhere(['=', 'library.user_id', Yii::$app->user->id])->orderBy(["name"=>SORT_ASC])->all();
         
         $level = $this->getFolderLevel($id,1);
         
@@ -224,20 +233,23 @@ class GameController extends Controller{
      * @return mixed
      */
     public function actionGenre($id){
-        $games = (new \yii\db\Query())->select(
+        $games = /*(new \yii\db\Query())->select(
             [
                 "game.id",
                 "game.name name",
                 "game.img_icon_url",
-                'GROUP_CONCAT(DISTINCT genre.name) gname',
+                //'GROUP_CONCAT(DISTINCT genre.name) gname',
             ])->
         from('game')->
-        join('LEFT JOIN', 'game_genre', 'game_genre.game_id = game.id')->
-        join('LEFT JOIN', 'genre', 'genre.id = game_genre.genre_id')->
+        //join('LEFT JOIN', 'game_genre', 'game_genre.game_id = game.id')->
+        join('LEFT JOIN', 'genre', '1 = 1')->
         andFilterWhere(['=', 'genre.id', $id])->
         join('LEFT JOIN', 'library', 'library.game_id = game.id')->
         andFilterWhere(['=', 'library.user_id', Yii::$app->user->id])->
-        groupBy("game.id");
+
+        where('game.temp_genre like CONCAT("%", genre.name, "%")')->
+        groupBy("game.id");*/
+        Game::find()->select(["name","id","img_icon_url"])->where(["like","temp_genre",$id])->orderBy(["name"=>SORT_ASC]);
 
         return $this->renderPartial("_games",["games"=>$games->all()]);
     }
@@ -247,19 +259,22 @@ class GameController extends Controller{
      * @return mixed
      */
     public function actionCategory($id){
-        $games = (new \yii\db\Query())->select(
+        $games = /*(new \yii\db\Query())->select(
             [
                 "game.id",
                 "game.name name",
                 "game.img_icon_url",
-                'GROUP_CONCAT(DISTINCT category.name) cname',
+                //'GROUP_CONCAT(DISTINCT category.name) cname',
             ])->
         from('game')->
-        join('LEFT JOIN', 'category_game', 'category_game.game_id = game.id')->
-        join('LEFT JOIN', 'category', 'category.id = category_game.category_id')->
+        //join('LEFT JOIN', 'category_game', 'category_game.game_id = game.id')->
+        join('LEFT JOIN', 'category', '1 = 1')->
+        andFilterWhere(['=', 'category.id', $id])->
         join('LEFT JOIN', 'library', 'library.game_id = game.id')->
         andFilterWhere(['=', 'library.user_id', Yii::$app->user->id])->
-        groupBy("game.id")->andFilterWhere(['=', 'category.id', $id]);
+        where('game.temp_category like CONCAT("%", category.name, "%")')->
+        groupBy("game.id")->andFilterWhere(['=', 'category.id', $id]);*/
+        Game::find()->select(["name","id","img_icon_url"])->where(["like","temp_category",$id])->orderBy(["name"=>SORT_ASC]);
 
         return $this->renderPartial("_games",["games"=>$games->all()]);
     }
@@ -269,19 +284,25 @@ class GameController extends Controller{
      * @return mixed
      */
     public function actionTag($id){
-        $games = (new \yii\db\Query())->select(
+        //$tag = Tag::findOne($id);
+        $games /*= (new \yii\db\Query())->select(
             [
                 "game.id",
                 "game.name name",
                 "game.img_icon_url",
-                'GROUP_CONCAT(DISTINCT tag.name) tname',
+                //'GROUP_CONCAT(DISTINCT tag.name) tname',
             ])->
         from('game')->
-        join('LEFT JOIN', 'game_tag', 'game_tag.game_id = game.id')->
-        join('LEFT JOIN', 'tag', 'tag.id = game_tag.tag_id')->
-        groupBy("game.id")->andFilterWhere(['=', 'tag.id', $id])->
+        //join('LEFT JOIN', 'game_tag', 'game_tag.game_id = game.id')->
+        join('LEFT JOIN', 'tag', '1 = 1')->
+        andFilterWhere(['=', 'tag.id', $id])->
         join('LEFT JOIN', 'library', 'library.game_id = game.id')->
-        andFilterWhere(['=', 'library.user_id', Yii::$app->user->id]);
+        andFilterWhere(['=', 'library.user_id', Yii::$app->user->id])->
+        where('game.temp_tag like CONCAT("%", tag.name, "%")')->
+        groupBy("game.id");*/
+        = Game::find()->select(["name","id","img_icon_url"])->where(["like","temp_tag",$id])->orderBy(["name"=>SORT_ASC]);
+        //var_dump($games->all());
+        //die();
 
         return $this->renderPartial("_games",["games"=>$games->all()]);
     }
@@ -338,4 +359,42 @@ class GameController extends Controller{
         }
         return $this->redirect(['view','id'=>$id]);
     }
+    
+    public function actionUpdater(){
+        $today = new \DateTime("-10 days");
+        $games = Game::find()->
+                    where(["<","update",$today->format("Y-m-d")])->
+                    orWhere(["is","update",null])->
+                    limit(100)->
+                    orderBy(["id"=>SORT_ASC])->
+                    all();
+        
+        $api = new SteamApi();
+        echo "First: " . $games[0]->id;
+        echo " Last: " .  $games[sizeof($games)-1]->id;
+        echo " ... ";
+        foreach($games as $game){
+            $api->updateGameInfo($game);
+        }
+        echo "Done\n";
+
+        $status = Game::find()->select(["dayofmonth(`update`) as day","count(*) as total"])->groupBy(["dayofmonth(`update`)"])->all();
+
+        foreach($status as $row){
+            echo "[Day = ". ($row->day?$row->day:"Null") .", Total = $row->total], ";
+        }
+    }
+
+    public function actionRandom(){
+        $library = Library::find()->where(["user_id"=> Yii::$app->user->id])->all();
+        //var_dump($library);
+        $total = sizeof($library);
+        $index = rand(0,$total-1);
+        //var_dump($index);
+        //die();
+        $winner = $library[$index];
+        //var_dump($winner);
+        return $this->render("view",["model"=>$winner->game]);//->game_id]);
+    }
+
 }

@@ -5,14 +5,26 @@ namespace app\controllers\clases;
 use Yii;
 use app\models\Game;
 use app\models\Library;
-use app\models\GameGenre;
-use app\models\CategoryGame;
+//use app\models\GameGenre;
+//use app\models\CategoryGame;
 use app\models\Category;
 use app\models\Genre;
+use app\models\Tag;
+
 use app\models\Metacritic;
 use app\models\Screenshots;
+use yii\helpers\ArrayHelper;
+
 
 class SteamAPI{
+
+    public $genres, $tags, $categories;
+
+    function __construct(){
+        $this->genres = ArrayHelper::map(Genre::find()->all(),"name","id");
+        $this->tags = ArrayHelper::map(Tag::find()->all(),"name","id");
+        $this->categories = ArrayHelper::map(Category::find()->all(),"name","id");
+    }
 
     public function getOwnedGames($steamUserId){
         $url = "http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=".Yii::$app->params["steam_api"]."&include_played_free_games=1&include_appinfo=1&format=json&steamid=" . $steamUserId;
@@ -26,7 +38,6 @@ class SteamAPI{
         );
         $result = curl_exec ( $ch );
         $obj = json_decode($result);
-
         return $this->save($obj);
     }
 
@@ -43,12 +54,8 @@ class SteamAPI{
             $library->game_id = $game->appid;
             $library->user_id = Yii::$app->user->id;
             $library->save();
-            if($g->save()){
-                $total++;
-            }
-            else{
-                $fail++;
-            }
+            if($g->save()){ $total++; }
+            else{ $fail++; }
         }
         return ["total"=>$total,"fail"=>$fail];
     }
@@ -57,16 +64,15 @@ class SteamAPI{
         $url = "https://store.steampowered.com/api/appdetails?appids=" . $model->id;
         $ch = curl_init();
         curl_setopt_array ( $ch, 
-            [
-                CURLOPT_HTTPHEADER => ['Accept: application/json'],
-                CURLOPT_URL => $url,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_SSL_VERIFYPEER => false,
-            ]
-        );
+        [
+            CURLOPT_HTTPHEADER => ['Accept: application/json'],
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_COOKIE => 'mature_content=' . 1 . '; path=/',
+        ]);
         $result = curl_exec ( $ch );
         $obj = json_decode($result);
-
         return $this->update($obj,$model);
     }
 
@@ -74,6 +80,9 @@ class SteamAPI{
         $total = 0;
         $fail = 0;
         $data = null;
+        $model->temp_tag = "";
+        $model->temp_category = "";
+        $model->temp_genre = "";
         $model->update = (new \DateTime())->format("Y-m-d H:i:s");
         if($result === null)
             return $this->noStore($model);
@@ -84,32 +93,25 @@ class SteamAPI{
         $model->controller_support = isset($data->controller_support)?$data->controller_support:null;
         $model->detailed_description = $data->detailed_description;
         $model->about_the_game = $data->about_the_game;
-        
         if(isset($data->pc_requirements) && isset($data->pc_requirements->minimum)){
             $model->pc_requirements_minimum = $data->pc_requirements->minimum;
         }
         if(isset($data->pc_requirements) && isset($data->pc_requirements->recommended)){
             $model->pc_requirements_recomended = $data->pc_requirements->recommended;
         }
-
         $model->developers = isset($data->developers)?$data->developers[0]:null;
         $model->publishers = isset($data->publishers)?$data->publishers[0]:null;
-
         if(isset($data->price_overview)){
             $model->price_currency = $data->price_overview->currency;
             $model->initial = $data->price_overview->initial;
         }
-
-            
         $model->platforms = "";
         foreach($data->platforms as $key => $value){
             if($value){
                 $model->platforms .= $key . " ";
             }
         }
-
         $model->background = $data->background;
-
         /* special data */
         $meta= null;
         if(isset($data->metacritic)){
@@ -122,33 +124,39 @@ class SteamAPI{
         }
         if(isset($data->categories)){
             foreach($data->categories as $value){
-                $cate = null;
-                if(!$cate = Category::findOne(["name"=>$value->description])){
-                    $cate = new Category();
-                    $cate->id = $value->id;
-                    $cate->name = $value->description;
-                    $cate->Save();
+                $cate = $value->description;
+                if(!isset($this->genres[$cate])){//!$cate = Category::findOne(["name"=>$value->description])){
+                    $nCate = new Category();
+                    $nCate->id = $value->id;
+                    $nCate->name = $value->description;
+                    $nCate->Save();
+                    $this->genres[$cate] = $nCate->id;
                 }
-                $cg = new CategoryGame();
+                /*$cg = new CategoryGame();
                 $cg->game_id = $model->id;
                 $cg->category_id = $cate->id;
-                $cg->save();
+                $cg->save();*/
+                $model->temp_category .= ", " . $cate;
             }
+            $model->temp_category = substr($model->temp_category, 1, strlen($model->temp_category));
         }
         if(isset($data->genres)){
             foreach($data->genres as $value){
-                $genre = null;
-                if(!$genre = Genre::findOne(["name"=>$value->description])){
-                    $genre = new Genre();
-                    $genre->id = $value->id;
-                    $genre->name = $value->description;
-                    $genre->Save();
-                }
+                $genre = $value->description;//null;
+                if(!isset($this->genre[$genre]) ){//!$genre = Genre::findOne(["name"=>$value->description])){
+                    $nGenre = new Genre();
+                    $nGenre->id = $value->id;
+                    $nGenre->name = $value->description;
+                    $nGenre->Save();
+                    $this->genre[$genre] = $nGenre->id;
+                }/*
                 $gg = new GameGenre();
                 $gg->game_id = $model->id;
                 $gg->genre_id = $genre->id;
-                $gg->save();
+                $gg->save();*/
+                $model->temp_genre .= ", " . $genre;
             }
+            $model->temp_genre = substr($model->temp_genre, 1, strlen($model->temp_genre));
         }
         if(isset($data->screenshots)){
             foreach($data->screenshots as $value){
@@ -161,54 +169,61 @@ class SteamAPI{
                 }
             }
         }
-
         $tags = $this->getTags($model->id);
+        /*var_dump($tags);
+        die();*/
         if($tags){
             foreach($tags as $tag){
-                $tagm = \app\models\Tag::findOne(["name"=>$tag]);
-                if(!$tagm){
-                    $tagm = new \app\models\Tag();
+                //$tagm = \app\models\Tag::findOne(["name"=>$tag]);
+                if(!isset($this->tag[$tag])){//!$tagm){
+                    $tagm = new Tag();
                     $tagm->name = $tag;
                     $tagm->save();
-                }
+                    $this->tag[$tag] = $tagm->id;
+                }/*
                 $tagmix = new \app\models\GameTag();
                 $tagmix->tag_id = $tagm->id;
                 $tagmix->game_id = $model->id;
-                $tagmix->save();
+                $tagmix->save();*/
+                $model->temp_tag .= ", " . $tag;
             }
+            $model->temp_tag = substr($model->temp_tag, 1, strlen($model->temp_tag));
         }
-
-        if($model->save()){
-            $total++;
-        }
-        else{
-            $fail++;
-        }
-
+        if($model->save()){ $total++; }
+        else{ $fail++; }
         return ["total"=>$total,"fail"=>$fail];
     }
 
     public function getTags($id){
-        $url = "https://store.steampowered.com/app/$id/";
+        $url = "https://store.steampowered.com/app/$id/agecheck/";
         $ch = curl_init();
         curl_setopt_array ( $ch, 
-            [
-                CURLOPT_HTTPHEADER => ['Accept: application/json'],
+        [
                 CURLOPT_URL => $url,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_USERAGENT => "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.2 (KHTML, like Gecko) Chrome/22.0.1216.0 Safari/537.2",
+                CURLOPT_COOKIE => 'mature_content=1; path=/',
             ]
         );
         $result = curl_exec ( $ch );
+        $result = str_replace("class=\"popup_menu_item\" ","", $result);
+        $result = str_replace('/?snr=1_agecheck_agecheck__12"',"/?snr=1_5_9__409\" class=\"app_tag\" style=\"display: none;\"", $result );
 
         $tags = [];
-
-        foreach( explode("<a href=\"https://store.steampowered.com/tags/en/",$result) as $row){
-            if(strpos($row,"class=\"app_tag\"")){
+        $arrays = explode("<a href=\"https://store.steampowered.com/tags/en/",$result);
+        foreach( $arrays as $row){
+            if(strpos($row,"/?snr=1_5_9__409\" class=\"app_tag\" style=\"display: none;\"")){
                 $end = strpos($row, "/?snr=1_5_9__409\" class=\"app_tag\" style=\"display: none;\">");
                 $data = substr($row, 0, ($end));
                 $data = urldecode($data);
                 $tags[$data] = $data;
+            }
+        }
+        foreach($tags as $key => $tag){
+            if(strlen($tag) > 100){
+                unset($tags[$key]);
             }
         }
         return $tags;
@@ -220,9 +235,6 @@ class SteamAPI{
         $model->about_the_game = "No store";
         return $model->save();
     }
-
+    
 }
-
-
-
 ?>

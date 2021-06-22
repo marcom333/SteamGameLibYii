@@ -21,19 +21,23 @@ class UpdaterController extends Controller
     {
         $today = new \DateTime("-5 days");
         $games = Game::find()->
-                    //where(["<","update",$today->format("Y-m-d")])->
-                    //orWhere(["is","update",null])->
-                    Where(["temp_tag"=>""])->
-                    limit(150)->
+                    where(["<","update",$today->format("Y-m-d")])->
+                    orWhere(["is","update",null])->
+                    //Where(["temp_tag"=>""])->
+                    //limit(150)->
                     orderBy(["id"=>SORT_ASC])->
                     all();
         $api = new SteamApi();
         echo "First: " . $games[0]->id;
         echo " Last: " .  $games[sizeof($games)-1]->id;
-        echo " ... ";
+        echo " ...\n";
+        $all = sizeof($games);
+        $where = 0;
         foreach($games as $game){
+            $where ++;
             $api->updateGameInfo($game);
-            echo "\nUpdating " . $game->name . $game->temp_tag . "\n";
+            echo "Updating $where/$all [" . $game->name . "]\n";
+            sleep(5);
         }
         echo "Done\n";
 

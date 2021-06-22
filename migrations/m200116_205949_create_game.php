@@ -29,9 +29,6 @@ class m200116_205949_create_game extends Migration
             "initial"=>$this->integer(),
             "platforms"=>$this->string(100),
             "background"=>$this->string(512),
-
-            "update"=>$this->date(),
-
             "temp_genre"=>$this->string(1024),
             "temp_category"=>$this->string(1024),
             "temp_tag"=>$this->string(1024),

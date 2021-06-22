@@ -19,7 +19,11 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::a('Update Library', ['create'], ['class' => 'btn btn-success']) ?> 
         <?= ""//Html::a('Update Details', ['details'], ['class' => 'btn btn-success']) ?>
     </p>
+
+    <?php $this->registerJs("$.pjax.reload({container:'#hello'});"); ?>
+    
     <div style="background-color: rgb(200,200,200); padding: 5px; border-radius:10px" class="table-responsive">
+        <?php \yii\widgets\Pjax::begin(["id"=>"hello"]); ?>
         <?= GridView::widget([
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
@@ -31,6 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         return "<img src=\"https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/".$model['id']."/" . $model['img_logo_url'] . ".jpg\"><br>".$model["name"];
                     }
                 ],
+                'id',
                 'controller_support',
                 'platforms',
                 [
@@ -81,6 +86,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 ]
             ],
         ]); ?>
+        <?php \yii\widgets\Pjax::end(); ?>
     </div>
+
 
 </div>

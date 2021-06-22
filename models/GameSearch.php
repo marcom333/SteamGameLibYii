@@ -130,17 +130,20 @@ class GameSearch extends Game
         ]);
 
         $query
-            ->andFilterWhere(['like', 'game.name', $this->name])
+            ->andFilterWhere(['like', 'LOWER(game.name)', strtolower($this->name)])
             ->andFilterWhere(['like', 'controller_support', $this->controller_support])
             ->andFilterWhere(['like', 'platforms', $this->platforms])
-            ->andFilterWhere(['like', 'temp_genre', $this->temp_genre])
-            ->andFilterWhere(['like', 'temp_tag', $this->temp_tag])
-            ->andFilterWhere(['like', 'temp_category', $this->temp_category])
+            ->andFilterWhere(['like', 'LOWER(temp_genre)', strtolower($this->temp_genre)])
+            ->andFilterWhere(['like', 'LOWER(temp_tag)', strtolower($this->temp_tag)])
+            ->andFilterWhere(['like', 'LOWER(temp_category)', strtolower($this->temp_category)])
             /*->andFilterWhere(['like', 'genre.name', $this->gname])
             ->andFilterWhere(['like', 'category.name', $this->cname])
             ->andFilterWhere(['like', 'tag.name', $this->tname])*/
 
         ;
+        
+        //var_dump($query->createCommand()->getRawSql());
+        //die();
 
         return $dataProvider;
     }

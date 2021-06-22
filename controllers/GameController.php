@@ -369,7 +369,7 @@ class GameController extends Controller{
                     orderBy(["id"=>SORT_ASC])->
                     all();
         
-        $api = new SteamApi();
+        $api = new clases\SteamApi();
         echo "First: " . $games[0]->id;
         echo " Last: " .  $games[sizeof($games)-1]->id;
         echo " ... ";

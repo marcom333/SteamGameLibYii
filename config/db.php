@@ -2,7 +2,7 @@
 
 return [
     'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=localhost;dbname=gamelib',
+    'dsn' => 'mysql:host=localhost;dbname=steamgamelibyii',
     'username' => 'root',
     'password' => '',
     'charset' => 'utf8',

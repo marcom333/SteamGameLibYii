@@ -42,4 +42,8 @@ class FolderGame extends \yii\db\ActiveRecord
             'folder_id' => 'Folder ID',
         ];
     }
+
+    public function getFolder(){
+        return $this->hasOne(Folder::className(),['id' => 'folder_id']);
+    }
 }

@@ -37,7 +37,7 @@ class UpdaterController extends Controller
             $where ++;
             $api->updateGameInfo($game);
             echo "Updating $where/$all [" . $game->name . "]\n";
-            sleep(5);
+            sleep(3);
         }
         echo "Done\n";
 
